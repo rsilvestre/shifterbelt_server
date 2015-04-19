@@ -1,0 +1,1 @@
+{"version":3,"sources":["/Users/michaelsilvestre/git/shifterbelt/beta/start.es6"],"names":[],"mappings":";;;;;;;;mBAIgB,OAAO","file":"start.js","sourcesContent":["/**\n * Created by michaelsilvestre on 19/04/15\n */\n\nimport app from \"./app\""]}
