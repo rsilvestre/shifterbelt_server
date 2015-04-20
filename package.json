@@ -4,7 +4,10 @@
   "description": "make communication between devices working true",
   "main": "start.js",
   "dependencies": {
+    "amqp": "^0.2.4",
+    "app-root-path": "^1.0.0",
     "chai": "^2.2.0",
+    "log": "^1.4.0",
     "minimist": "1.1.1",
     "mssql": "^2.1.2",
     "rabbit.js": "^0.4.2",

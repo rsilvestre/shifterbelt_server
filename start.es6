@@ -3,7 +3,12 @@
  */
 
 import App from "./app"
-import Bootstrap from './lib/bootstrap.js'
+import Bootstrap from "./lib/bootstrap.js"
+import Logger from "./lib/logger.js"
+import * as logConfig from "./config/logs.js"
+
+let logger = new Logger();
+logger.init(logConfig.config.logLevel, logConfig.config.path);
 
 let bootstrap = new Bootstrap(App);
 bootstrap.run();

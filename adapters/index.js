@@ -21,10 +21,15 @@ var _RabbitAdapter = require('./rabbitmq-adapter.js');
 
 var _RabbitAdapter2 = _interopRequireWildcard(_RabbitAdapter);
 
+var _AmqpAdapter = require('./amqp-adapter.js');
+
+var _AmqpAdapter2 = _interopRequireWildcard(_AmqpAdapter);
+
 var adapters = {
     mssqlAdapter: _MssqlAdapter2['default'],
     redisAdapter: _RedisAdapter2['default'],
-    rabbitAdapter: _RabbitAdapter2['default']
+    rabbitAdapter: _RabbitAdapter2['default'],
+    amqpAdapter: _AmqpAdapter2['default']
 };
 exports.adapters = adapters;
 

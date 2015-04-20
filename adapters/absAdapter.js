@@ -17,6 +17,12 @@ var _import = require("../config/adapters.js");
 
 var config = _interopRequireWildcard(_import);
 
+var _Logger = require("../lib/logger.js");
+
+var _Logger2 = _interopRequireWildcard(_Logger);
+
+var log = new _Logger2["default"]();
+
 var adapters = {};
 
 var AbsAdapter = (function () {
@@ -25,6 +31,7 @@ var AbsAdapter = (function () {
 
         this._key = config.adapters.getAdapter(name);
         this.addAdapter(this._key, this);
+        log.debug = "the module: " + this._key + ", has been added to the adapters list";
     }
 
     _createClass(AbsAdapter, [{
