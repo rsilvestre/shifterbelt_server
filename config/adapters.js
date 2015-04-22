@@ -9,7 +9,8 @@ Object.defineProperty(exports, '__esModule', {
 var defaultValue = {
     database: 'mssql',
     memory: 'redis',
-    queue: 'amqp'
+    queue: 'amqp',
+    websocket: 'socketIo'
 };
 
 var config = {
@@ -53,6 +54,13 @@ var config = {
         adapter: 'amqpAdapter',
         config: {
             url: 'amqp://cutma1X1:aSSRFXC7_K5MvnwAGKrg3uZ7CMTCiTNt@swift-bluebell-30.bigwig.lshift.net:11068/0kFUqWJSIiki'
+        }
+    },
+    socketIo: {
+        adapter: 'wsAdapter',
+        config: {
+            port: 3000,
+            namespace: 'ns'
         }
     }
 };

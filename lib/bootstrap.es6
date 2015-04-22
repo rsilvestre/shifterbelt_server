@@ -4,12 +4,14 @@
 
 import * as adapters from "../adapters/index.js"
 import * as config from "../config/adapters.js"
+import socketIo from "socket.io"
 
 function getAdapter(name) {
     return config.adapters[name];
 }
 
-function dbloader(name) {
+function dbloader(key) {
+    let name = config.adapters.getAdapter(key);
     return new Promise((resolve, reject) => {
         new adapters.adapters[name](resolve);
     });
@@ -21,15 +23,19 @@ export default class Bootstrap {
     }
 
     run() {
-        var p = dbloader(config.adapters.getAdapter("database"))
+        var p = dbloader("database")
             .then(()=> {
-                return dbloader(config.adapters.getAdapter('memory'));
+                return dbloader("memory");
             })
             .then(() => {
-                return dbloader(config.adapters.getAdapter('queue'));
-            }).then((rabbitAdapter) => {
-                let adapters = rabbitAdapter.getAdapters();
-                let app = new this._application(adapters);
+                return dbloader("queue");
+            })
+            .then(() => {
+                return dbloader("websocket");
+            })
+            .then(() => {
+
+                let app = new this._application();
 
             });
     }

@@ -23,7 +23,25 @@ var _Logger2 = _interopRequireWildcard(_Logger);
 
 var log = new _Logger2["default"]();
 
-var adapters = {};
+var adapterContainers = {};
+
+function extra(key) {
+    if (!this.hasOwnProperty(key) && !this.hasOwnProperty(config.adapters.getAdapter(key))) {
+        return new Error("The adaptater: " + key + ", not exist");
+    }
+    return this[key] || this[config.adapters.getAdapter(key)];
+}
+
+var adapters = {
+    getAdapters: function getAdapters() {
+        return adapterContainers;
+    },
+    getAdapter: function getAdapter(name) {
+        return extra.call(adapterContainers, name);
+    }
+};
+
+exports.adapters = adapters;
 
 var AbsAdapter = (function () {
     function AbsAdapter(name) {
@@ -42,32 +60,32 @@ var AbsAdapter = (function () {
     }, {
         key: "addAdapter",
         value: function addAdapter(key, value) {
-            if (adapters.hasOwnProperty(value)) {
+            if (adapterContainers.hasOwnProperty(value)) {
                 return new Error("The adapter: " + value + ", still exist");
             }
-            adapters[key] = value;
+            adapterContainers[key] = value;
         }
     }, {
         key: "getAdapters",
         value: function getAdapters() {
-            return adapters;
+            return adapterContainers;
         }
     }, {
         key: "getAdapterByKey",
         value: function getAdapterByKey(key) {
-            if (!adapters.hasOwnProperty(key)) {
+            if (!adapterContainers.hasOwnProperty(key)) {
                 return new Error("The adaptater: " + key + ", not exist");
             }
-            return adapters[key];
+            return adapterContainers[key];
         }
     }, {
         key: "getAdapterByName",
         value: function getAdapterByName(name) {
             var key = config.adapters.getAdapter(name);
-            if (!adapters.hasOwnProperty(key)) {
+            if (!adapterContainers.hasOwnProperty(key)) {
                 return new Error("The key: " + key + ", not exist");
             }
-            return adapters[key];
+            return adapterContainers[key];
         }
     }]);
 
@@ -75,6 +93,5 @@ var AbsAdapter = (function () {
 })();
 
 exports["default"] = AbsAdapter;
-module.exports = exports["default"];
 
 //# sourceMappingURL=absAdapter.js.map

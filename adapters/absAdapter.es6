@@ -7,7 +7,23 @@ import Logger from "../lib/logger.js"
 
 let log = new Logger();
 
-let adapters = {};
+let adapterContainers = {};
+
+function extra(key) {
+    if (!this.hasOwnProperty(key) && !this.hasOwnProperty(config.adapters.getAdapter(key))) {
+        return new Error(`The adaptater: ${key}, not exist`);
+    }
+    return this[key] || this[config.adapters.getAdapter(key)];
+}
+
+export let adapters = {
+    getAdapters() {
+        return adapterContainers;
+    },
+    getAdapter(name) {
+        return extra.call(adapterContainers, name);
+    }
+};
 
 export default class AbsAdapter {
     constructor(name) {
@@ -21,28 +37,28 @@ export default class AbsAdapter {
     }
 
     addAdapter(key, value) {
-        if (adapters.hasOwnProperty(value)) {
+        if (adapterContainers.hasOwnProperty(value)) {
             return new Error(`The adapter: ${value}, still exist`);
         }
-        adapters[key] = value;
+        adapterContainers[key] = value;
     }
 
     getAdapters() {
-        return adapters;
+        return adapterContainers;
     }
 
     getAdapterByKey(key) {
-        if (!adapters.hasOwnProperty(key)) {
+        if (!adapterContainers.hasOwnProperty(key)) {
             return new Error(`The adaptater: ${key}, not exist`)
         }
-        return adapters[key];
+        return adapterContainers[key];
     }
 
     getAdapterByName(name) {
         let key = config.adapters.getAdapter(name);
-        if (!adapters.hasOwnProperty(key)) {
+        if (!adapterContainers.hasOwnProperty(key)) {
             return new Error(`The key: ${key}, not exist`);
         }
-        return adapters[key];
+        return adapterContainers[key];
     }
 }

@@ -17,50 +17,44 @@ var _import = require("./config/adapters.js");
 
 var config = _interopRequireWildcard(_import);
 
-function extra(key) {
-    if (!this.hasOwnProperty(key) && !this.hasOwnProperty(config.adapters.getAdapter(key))) {
-        return new Error("The adaptater: " + key + ", not exist");
-    }
-    return this[key] || this[config.adapters.getAdapter(key)];
-}
+var _import2 = require("./models");
+
+var models = _interopRequireWildcard(_import2);
+
+var _modelManager = require("./lib/model-manager.js");
+
+var _adapters = require("./adapters/absAdapter.js");
 
 var App = (function () {
-    function App(adapters) {
+    function App() {
         _classCallCheck(this, App);
 
-        this._adapters = adapters;
         this.init();
     }
 
     _createClass(App, [{
         key: "init",
         value: function init() {
-            var mssqlAdapter = this.getAdapter("database");
+            var mssqlAdapter = _adapters.adapters.getAdapter("database");
 
             var callback = function callback(err, result) {
                 if (err) throw err;
-                console.log(result);
+                var applications = {};
+                result[0].forEach(function (value) {
+                    applications[value.ApplicationId] = _modelManager.modelManager.instanciate("Application", value.ApplicationName);
+                });
+                console.log(applications);
                 mssqlAdapter.connection.close();
             };
             var mssql = mssqlAdapter.mssql;
 
             var request = new mssql.Request();
 
-            request.execute("[dbo].[Users.SelectAll]", function (err, record, returnValue) {
+            request.execute("[dbo].[Applications.SelectAll]", function (err, records, returnValue) {
                 if (err) return callback(err, null);
-                return callback(null, record);
+                return callback(null, records);
             });
             //console.log(mssqlAdapter.mssql);
-        }
-    }, {
-        key: "adapters",
-        get: function () {
-            return this._adapters;
-        }
-    }, {
-        key: "getAdapter",
-        value: function getAdapter(name) {
-            return extra.call(this.adapters, name);
         }
     }]);
 

@@ -18,6 +18,24 @@ import fs from "fs"
 import appRootPath from "app-root-path"
 export var log = null;
 
+export let logger = {
+    error: (value) => {
+        if (log instanceof Logger) {
+            log.error(value);
+        }
+    },
+    debug: (value) => {
+        if (log instanceof Logger) {
+            log.debug(value);
+        }
+    },
+    info: (value) => {
+        if (log instanceof Logger) {
+            log.info(value);
+        }
+    }
+};
+
 export default class Logger {
     constructor() {
     }

@@ -25,11 +25,16 @@ var _AmqpAdapter = require('./amqp-adapter.js');
 
 var _AmqpAdapter2 = _interopRequireWildcard(_AmqpAdapter);
 
+var _WebsocketAdapter = require('./websocket-adapter.js');
+
+var _WebsocketAdapter2 = _interopRequireWildcard(_WebsocketAdapter);
+
 var adapters = {
     mssqlAdapter: _MssqlAdapter2['default'],
     redisAdapter: _RedisAdapter2['default'],
     rabbitAdapter: _RabbitAdapter2['default'],
-    amqpAdapter: _AmqpAdapter2['default']
+    amqpAdapter: _AmqpAdapter2['default'],
+    wsAdapter: _WebsocketAdapter2['default']
 };
 exports.adapters = adapters;
 
