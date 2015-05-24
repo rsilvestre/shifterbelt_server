@@ -1,58 +1,54 @@
 "use strict";
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
+
+var _interopRequireDefault = function(obj) {
+    return obj && obj.__esModule ? obj : { "default": obj };
+};
+
 /**
- * Created by michaelsilvestre on 20/04/15
+ * Created by michaelsilvestre on 24/04/15
  */
 
-var Device = (function () {
-    function Device(macAddress) {
-        _classCallCheck(this, Device);
+var _mongoose = require("mongoose");
 
-        this._macAddress = macAddress;
-    }
+var _mongoose2 = _interopRequireDefault(_mongoose);
 
-    _createClass(Device, [{
-        key: "macAddress",
-        get: function () {
-            return this._macAddress;
-        }
-    }, {
-        key: "application",
-        set: function (value) {
-            this._application = value;
-        },
-        get: function () {
-            return this._application;
-        }
-    }, {
-        key: "password",
-        set: function (value) {
-            this._password = value;
-        },
-        get: function () {
-            return this._password;
-        }
-    }, {
-        key: "keyName",
-        set: function (value) {
-            this._keyName = value;
-        },
-        get: function () {
-            return this._keyName;
-        }
-    }]);
+var deviceSchema = _mongoose2["default"].Schema({
+    macAddress: {
+        type: String,
+        required: "macAddress is required",
+        unique: true,
+        trim: true,
+        validate: [function(value) {
+            return /[a-z0-9]{12}/.test(value);
+        }, "Invalid Mac Address"],
+        match: [/[a-z0-9]{12}/, "Please fill a valid Mac Address"]
+    },
+    applications: [{
+        applicationId: { type: _mongoose2["default"].Schema.Types.ObjectId, ref: "Application", required: true },
+        active: { type: Boolean, required: true },
+        role: { type: String, required: true, "enum": ["master", "manager", "slave"] }
+    }],
+    createdAt: { type: Date, "default": Date.now }
+});
 
-    return Device;
-})();
+deviceSchema.index({ macAddress: 1 });
 
-exports["default"] = Device;
-module.exports = exports["default"];
+var Device = _mongoose2["default"].model("Device", deviceSchema);
+
+exports.Device = Device;
+Device.schema.path("macAddress").validate();
+
+Device.schema.path("applications").validate(function(value) {
+    value.forEach(function(application) {
+        if (!/master|manager|slave/.test(application.role)) {
+            return false;
+        }
+    });
+    return true;
+}, "Invalid application role");
 
 //# sourceMappingURL=device.js.map

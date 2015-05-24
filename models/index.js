@@ -2,28 +2,35 @@
 
 var _interopRequireWildcard = function (obj) { return obj && obj.__esModule ? obj : { "default": obj }; };
 
+var _defaults = function(obj, defaults) {
+  var keys = Object.getOwnPropertyNames(defaults);
+  for (var i = 0; i < keys.length; i++) {
+    var key = keys[i];
+    var value = Object.getOwnPropertyDescriptor(defaults, key);
+    if (value && value.configurable && obj[key] === undefined) {
+      Object.defineProperty(obj, key, value);
+    }
+  }
+  return obj;
+};
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 /**
- * Created by michaelsilvestre on 19/04/15
+ * Created by michaelsilvestre on 23/04/15
  */
 
-var _Master = require("./master.js");
+var _applicationJs = require("./application.js");
 
-var _Master2 = _interopRequireWildcard(_Master);
+_defaults(exports, _interopRequireWildcard(_applicationJs));
 
-var _Slave = require("./slave.js");
+var _deviceJs = require("./device.js");
 
-var _Slave2 = _interopRequireWildcard(_Slave);
+_defaults(exports, _interopRequireWildcard(_deviceJs));
 
-var _Manager = require("./manager.js");
+var _userJs = require("./user.js");
 
-var _Manager2 = _interopRequireWildcard(_Manager);
-
-var _Application = require("./application.js");
-
-var _Application2 = _interopRequireWildcard(_Application);
-
-var _Identity = require("./identity.js");
-
-var _Identity2 = _interopRequireWildcard(_Identity);
+_defaults(exports, _interopRequireWildcard(_userJs));
 
 //# sourceMappingURL=index.js.map

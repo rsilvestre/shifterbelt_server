@@ -7,7 +7,7 @@ Object.defineProperty(exports, '__esModule', {
  * Created by michaelsilvestre on 19/04/15
  */
 var defaultValue = {
-    database: 'mssql',
+    database: 'mongoose_local',
     memory: 'redis',
     queue: 'amqp',
     websocket: 'socketIo'
@@ -27,12 +27,25 @@ var config = {
             }
         }
     },
+    mongoose_local: {
+        adapter: 'mongooseAdapter',
+        config: {
+            url: 'mongodb://localhost:27017/heroku_app31319631'
+        }
+    },
+    mongoose: {
+        adapter: 'mongooseAdapter',
+        config: {
+            url: 'mongodb://heroku_app36294777:sm4tcjdlcnjh95l70jvn1ijc05@ds063769.mongolab.com:63769/heroku_app36294777'
+        }
+    },
     redis: {
         adapter: 'redisAdapter',
         config: {
             connection: {
                 type: 'redis',
                 host: 'localhost', // optional
+                password: '',
                 port: 6379, // optional
                 prefix: 'sess', // optional
                 ttl: 804600, // optional
@@ -47,13 +60,14 @@ var config = {
     rabbitmq: {
         adapter: 'rabbitAdapter',
         config: {
-            url: 'amqp://cutma1X1:aSSRFXC7_K5MvnwAGKrg3uZ7CMTCiTNt@swift-bluebell-30.bigwig.lshift.net:11068/0kFUqWJSIiki'
+            url: 'amqp://sailmvbd:dUaYzF6Zzec7zIqH8r90ubfbVh-cohPa@bunny.cloudamqp.com/sailmvbd'
         }
     },
     amqp: {
         adapter: 'amqpAdapter',
         config: {
-            url: 'amqp://cutma1X1:aSSRFXC7_K5MvnwAGKrg3uZ7CMTCiTNt@swift-bluebell-30.bigwig.lshift.net:11068/0kFUqWJSIiki'
+            //url: 'amqp://cutma1X1:aSSRFXC7_K5MvnwAGKrg3uZ7CMTCiTNt@swift-bluebell-30.bigwig.lshift.net:11068/0kFUqWJSIiki'
+            url: 'amqp://sailmvbd:dUaYzF6Zzec7zIqH8r90ubfbVh-cohPa@bunny.cloudamqp.com/sailmvbd'
         }
     },
     socketIo: {

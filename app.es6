@@ -5,6 +5,7 @@ import * as config from "./config/adapters.js"
 import * as models from "./models"
 import { modelManager } from "./lib/model-manager.js"
 import { adapters } from "./adapters/absAdapter.js"
+import Controller from "./controller/index.js.js"
 
 export default class App {
     constructor() {
@@ -12,6 +13,12 @@ export default class App {
     }
 
     init() {
+
+        let controller = new Controller();
+
+    }
+
+    init_bak() {
         let mssqlAdapter = adapters.getAdapter("database");
 
         let callback = function (err, result) {

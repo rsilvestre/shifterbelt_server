@@ -1,1 +1,12 @@
-{"version":3,"sources":["/Users/michaelsilvestre/git/shifterbelt/beta/models/index.es6"],"names":[],"mappings":";;;;;;;;sBAImB,aAAa;;;;qBACd,YAAY;;;;uBACV,cAAc;;;;2BACV,kBAAkB;;;;wBACrB,eAAe","file":"index.js","sourcesContent":["/**\n * Created by michaelsilvestre on 19/04/15\n */\n\nimport Master from \"./master.js\"\nimport Slave from \"./slave.js\"\nimport Manager from \"./manager.js\"\nimport Application from \"./application.js\"\nimport Identity from \"./identity.js\""]}
+{
+  "version": 3,
+  "sources": [
+    "/Users/michaelsilvestre/git/shifterbelt/beta/models/index.es6"
+  ],
+  "names": [],
+  "mappings": ";;;;;;;;;;;;;6BAIc,kBAAkB;;;;wBAClB,aAAa;;;;sBACb,WAAW",
+  "file": "index.js",
+  "sourcesContent": [
+    "/**\n * Created by michaelsilvestre on 23/04/15\n */\n\nexport * from \"./application.js\"\nexport * from \"./device.js\"\nexport * from \"./user.js\"\n"
+  ]
+}

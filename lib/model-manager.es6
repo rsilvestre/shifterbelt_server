@@ -10,15 +10,23 @@ export let modelManager = {
     model: (name, model = undefined) => {
         if (!model) {
             if (!modelManagers.hasOwnProperty(name)) {
-                return  null;
+                return new Error(`The model: ${name}, not exist`);
             }
             return modelManagers[name];
         }
-        if (modelManagers.hasOwnProperty(name)) {
-            return null;
+        if (modelManagers.hasOwnProperty(name) && modelManagers[name].model) {
+            return new Error(`The model: ${name}, contain a model`);
         }
-        modelManagers[name] = new ModelManager(model);
         return modelManager[name];
+    },
+    schema: (name, schema) => {
+        if (!modelManagers.hasOwnProperty(name)) {
+            return new Error(`The model: ${name}, not exist`);
+        }
+        if (modelManagers.hasOwnProperty(name)) {
+            return new Error(`The model: ${name}, exist`);
+        }
+        return modelManagers[name] = new ModelManager(schema);
     },
     instanciate: (name, ...args) => {
         if (!modelManagers.hasOwnProperty(name)) {
@@ -36,8 +44,8 @@ export function model(name, model = undefined) {
 
 
 class ModelManager {
-    constructor(model) {
-        this._model = model;
+    constructor(schema) {
+        this._schema = schema;
     }
 
     instanciate(...args) {
@@ -46,5 +54,21 @@ class ModelManager {
 
     get instance() {
         return this._instance;
+    }
+
+    set model(value) {
+        this._model = value;
+    }
+
+    get model() {
+        return this._model;
+    }
+
+    set schema(value) {
+        this._schema = value;
+    }
+
+    get schema() {
+        return this._schema;
     }
 }

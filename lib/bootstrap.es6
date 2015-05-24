@@ -4,7 +4,6 @@
 
 import * as adapters from "../adapters/index.js"
 import * as config from "../config/adapters.js"
-import socketIo from "socket.io"
 
 function getAdapter(name) {
     return config.adapters[name];
