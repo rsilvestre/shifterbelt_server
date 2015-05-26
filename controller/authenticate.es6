@@ -3,8 +3,10 @@
  */
 
 import { adapters } from "../adapters/absAdapter.js"
+import { LinkDevice } from "./message.js"
 import _ from "underscore"
 import mongoose from "mongoose"
+import getmac from "getmac"
 
 let Application = mongoose.model('Application');
 
@@ -33,8 +35,18 @@ export let authenticateInit = () => {
           console.log(`restoring socket to: ${nsp.name}`);
           nsp.connected[socket.id] = socket;
         });
-        socket.emit('authenticated');
-        socket.emit('message', { event: "first server message" });
+
+
+        let linkDevice = new LinkDevice(device, socket, (err, queue) => {
+          if (err) {
+            return console.warn(err);
+          }
+          queue.emit('authenticated');
+          queue.emit('message', { event: "first server message" });
+        });
+        socket.on('disconnect', () => {
+          linkDevice.disconnect();
+        })
       });
     });
 
@@ -78,6 +90,10 @@ class Authenticate {
       return callback(new Error("Missing password for the authentification"), null);
     }
 
+    if (!this._data.hasOwnProperty('macAddress')) {
+      return callback(new Error("Missing macAddress for the authentification"), null);
+    }
+
     if (!_.isString(this._data['key'])) {
       return callback(new Error("Key should be a string"), null);
     }
@@ -96,6 +112,10 @@ class Authenticate {
 
     if (!_.isNumber(this._data['applicationId'])) {
       return callback(new Error("ApplicationId should be a number"), null);
+    }
+
+    if (!getmac.isMac(this._data['macAddress'])) {
+      return callback(new Error("The mac address is not correctly formated"), null);
     }
 
     Application.authenticate(this._data, (err, result) => {

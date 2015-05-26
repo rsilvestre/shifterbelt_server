@@ -1,40 +1,37 @@
+/**
+ * Created by michaelsilvestre on 20/04/15
+ */
+
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _interopRequireWildcard = function(obj) {
-  if (obj && obj.__esModule) {
-    return obj;
-  } else {
-    var newObj = {};
-    if (obj != null) {
-      for (var key in obj) {
-        if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
-      }
+var _createClass = (function() {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];
+      descriptor.enumerable = descriptor.enumerable || false;
+      descriptor.configurable = true;
+      if ("value" in descriptor) descriptor.writable = true;
+      Object.defineProperty(target, descriptor.key, descriptor);
     }
-    newObj["default"] = obj;
-    return newObj;
   }
-};
 
-var _interopRequireDefault = function(obj) {
-  return obj && obj.__esModule ? obj : { "default": obj };
-};
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+  return function(Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) defineProperties(Constructor, staticProps);
+    return Constructor;
+  };
+})();
 
 var _get = function get(_x, _x2, _x3) {
   var _again = true;
   _function: while (_again) {
+    var object = _x, property = _x2, receiver = _x3;
     desc = parent = getter = undefined;
     _again = false;
-    var object = _x,
-      property = _x2,
-      receiver = _x3;
     var desc = Object.getOwnPropertyDescriptor(object, property);
     if (desc === undefined) {
       var parent = Object.getPrototypeOf(object);
@@ -59,118 +56,167 @@ var _get = function get(_x, _x2, _x3) {
   }
 };
 
-var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+function _interopRequireWildcard(obj) {
+  if (obj && obj.__esModule) {
+    return obj;
+  } else {
+    var newObj = {};
+    if (obj != null) {
+      for (var key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+      }
+    }
+    newObj["default"] = obj;
+    return newObj;
+  }
+}
 
-/**
- * Created by michaelsilvestre on 20/04/15
- */
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { "default": obj };
+}
 
-var _amqp = require("amqplib");
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
 
-var _amqp2 = _interopRequireDefault(_amqp);
+function _inherits(subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+  }
+  subClass.prototype = Object.create(superClass && superClass.prototype, {
+    constructor: {
+      value: subClass,
+      enumerable: false,
+      writable: true,
+      configurable: true
+    }
+  });
+  if (superClass) subClass.__proto__ = superClass;
+}
+
+var _amqplib = require("amqplib");
+
+var _amqplib2 = _interopRequireDefault(_amqplib);
 
 var _when = require("when");
 
 var _when2 = _interopRequireDefault(_when);
 
-var _import = require("../config/adapters.js");
+var _configAdaptersJs = require("../config/adapters.js");
 
-var config = _interopRequireWildcard(_import);
+var config = _interopRequireWildcard(_configAdaptersJs);
 
-var _AbsAdapter2 = require("./absAdapter.js");
+var _absAdapterJs = require("./absAdapter.js");
 
-var _AbsAdapter3 = _interopRequireDefault(_AbsAdapter2);
+var _absAdapterJs2 = _interopRequireDefault(_absAdapterJs);
 
 var AmqpAdapter = (function (_AbsAdapter) {
   function AmqpAdapter(callback) {
+    var _this = this;
+
     _classCallCheck(this, AmqpAdapter);
 
     _get(Object.getPrototypeOf(AmqpAdapter.prototype), "constructor", this).call(this, "queue");
 
-    this.init(callback);
+    this._connPub = null;
+    this._connSub = null;
+    this._chPub = null;
+    this._chSub = null;
+    this.init(function() {
+      callback(_this);
+    });
   }
 
   _inherits(AmqpAdapter, _AbsAdapter);
 
   _createClass(AmqpAdapter, [{
-    key: "init2",
-    value: function init2(callback) {
+    key: "init",
+    value: function init(callback) {
       var _this2 = this;
 
-      var amqpConfig = config.adapters.getConfig("queue");
+      this.createSubChannel(callback, function() {
+        for (var _len = arguments.length, arg = Array(_len), _key = 0; _key < _len; _key++) {
+          arg[_key] = arguments[_key];
+        }
 
-      this._connection = _amqp2["default"].createConnection(amqpConfig);
-      this._connection.on("ready", function() {
-        console.log("amqp successfull connected");
-        callback(_this2);
+        _this2.createPubChannel.apply(_this2, arg);
+      });
+
+      process.once("SIGINT", function() {
+        console.log("Got SIGINT.  Press Control-D to exit.");
+        console.log("close channel pub");
+        var ok = _this2._chPub.close();
+        ok = ok.then(function(err) {
+          if (err) throw err;
+          console.log("channel pub closed");
+          console.log("close channel sub");
+          return _this2._chSub.close();
+        });
+        ok = ok.then(function(err) {
+          if (err) throw err;
+          console.log("channel sub closed");
+          console.log("close connection pub");
+          return _this2._connPub.close();
+        });
+        ok = ok.then(function(err) {
+          if (err) throw err;
+          console.log("connection pub closed");
+          console.log("close connection sub");
+          return _this2._connSub.close();
+        });
+        ok.then(function(err) {
+          if (err) throw err;
+          console.log("connection sub closed");
+          process.exit(0);
+        });
       });
     }
   }, {
-    key: "init",
-    value: function init(callback) {
+    key: "createSubChannel",
+    value: function createSubChannel(callback, next) {
       var _this3 = this;
 
       var amqpConfig = config.adapters.getConfig("queue");
-
-      _amqp2["default"].connect(amqpConfig.url).then(function(conn) {
+      _amqplib2["default"].connect(amqpConfig.url).then(function(conn) {
+        _this3._connSub = conn;
         console.log("amqb sub connected successfull connected");
-        process.once("SIGINT", function() {
-          conn.close();
-        });
         return conn.createChannel().then(function(ch) {
-          var ok = ch.assertExchange("pubsub", "fanout", { durable: false });
-
-          ok = ok.then(function() {
-            return ch.assertQueue("", { exclusive: true });
-          });
-
-          ok = ok.then(function(qok) {
-            return ch.bindQueue(qok.queue, "pubsub", "").then(function() {
-              return qok.queue;
-            });
-          });
-
-          ok = ok.then(function(queue) {
-            return ch.consume(queue, logMessage, { noAck: true });
-          });
-
-          return ok.then(function() {
-            console.log(" [*] Waiting for message");
-            _amqp2["default"].connect(amqpConfig.url).then(function(conn) {
-              console.log("amqb pub connected successfull connected");
-              return _when2["default"](conn.createChannel().then(function(ch) {
-                callback(_this3);
-                var ex = "pubsub";
-                var ok = ch.assertExchange(ex, "fanout", { durable: false });
-
-                var message = "Hello World";
-
-                return ok.then(function() {
-                  ch.publish(ex, "", new Buffer(message));
-                  console.log(" [x] Sent '%s'", message);
-                  return ch.close();
-                });
-              })).ensure(function() {
-                conn.close();
-              });
-            }).then(null, console.warn);
-          });
-
-          function logMessage(msg) {
-            console.log(" [x] '%s'", msg.content.toString());
-          }
+          _this3._chSub = ch;
+          return next(callback);
         });
       }).then(null, console.warn);
     }
   }, {
-    key: "connection",
+    key: "createPubChannel",
+    value: function createPubChannel(next) {
+      var _this4 = this;
+
+      var amqpConfig = config.adapters.getConfig("queue");
+      _amqplib2["default"].connect(amqpConfig.url).then(function(conn) {
+        _this4._connPub = conn;
+        console.log("amqb pub connected successfull connected");
+        return (0, _when2["default"])(conn.createChannel().then(function(ch) {
+          _this4._chPub = ch;
+          next();
+        })) /*.ensure(() => { console.log('closed!!!!!!!'); conn.close(); })*/;
+      }).then(null, console.warn);
+    }
+  }, {
+    key: "chSub",
     get: function() {
-      return this._connection;
+      return this._chSub;
+    }
+  }, {
+    key: "chPub",
+    get: function() {
+      return this._chPub;
     }
   }]);
 
   return AmqpAdapter;
-})(_AbsAdapter3["default"]);
+})(_absAdapterJs2["default"]);
 
 exports["default"] = AmqpAdapter;
 module.exports = exports["default"];

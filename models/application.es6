@@ -255,6 +255,8 @@ ApplicationSchema.statics = {
         });
         cb(null, {
           applicationId: result._id,
+          businessId: result.businessId,
+          macAddress: data.macAddress.replace(/:/g, ''),
           strategy: result.strategy,
           role: keys[0].role || ""
         });

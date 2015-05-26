@@ -1,13 +1,3 @@
-'use strict';
-
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
-
-var _interopRequireDefault = function(obj) {
-  return obj && obj.__esModule ? obj : { 'default': obj };
-};
-
 /**
  * Created by michaelsilvestre on 23/04/15
  */
@@ -15,6 +5,16 @@ var _interopRequireDefault = function(obj) {
 /**
  * Module dependencies.
  */
+
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { 'default': obj };
+}
 
 var _mongoose = require('mongoose');
 
@@ -38,9 +38,7 @@ var makeSalt = function makeSalt() {
 };
 
 var encryptPassword = function encryptPassword(password) {
-  if (!password) {
-    return '';
-  }
+  if (!password) return '';
   try {
     return _crypto2['default'].createHmac('sha1', this.salt).update(password).digest('hex');
   } catch (err) {
@@ -58,7 +56,7 @@ var Generator = function Generator(preSave) {
 
   this.businessId = function(cb) {
     var businessId = makeSalt();
-    Application.find({ businessId: businessId }).select('businessId').exec(function(err, result) {
+    Application.find({ 'businessId': businessId }).select('businessId').exec(function(err, result) {
       if (err) return cb(err);
 
       if (result.length > 0) {
@@ -257,6 +255,8 @@ ApplicationSchema.statics = {
       });
       cb(null, {
         applicationId: result._id,
+        businessId: result.businessId,
+        macAddress: data.macAddress.replace(/:/g, ''),
         strategy: result.strategy,
         role: keys[0].role || ''
       });

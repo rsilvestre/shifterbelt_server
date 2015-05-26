@@ -11,75 +11,81 @@ export default class AmqpAdapter extends AbsAdapter {
   constructor(callback) {
     super("queue");
 
-    this.init(callback);
-  }
-
-  init2(callback) {
-    let amqpConfig = config.adapters.getConfig("queue");
-
-    this._connection = amqp.createConnection(amqpConfig);
-    this._connection.on('ready', () => {
-      console.log('amqp successfull connected');
+    this._connPub = null;
+    this._connSub = null;
+    this._chPub = null;
+    this._chSub = null;
+    this.init(() => {
       callback(this);
     });
   }
 
   init(callback) {
-    let amqpConfig = config.adapters.getConfig("queue");
+    this.createSubChannel(callback, (...arg) => {
+      this.createPubChannel(...arg);
+    });
 
-    amqp.connect(amqpConfig.url).then((conn) => {
-      console.log("amqb sub connected successfull connected");
-      process.once('SIGINT', () => {
-        conn.close();
+    process.once('SIGINT', () => {
+      console.log('Got SIGINT.  Press Control-D to exit.');
+      console.log('close channel pub');
+      let ok = this._chPub.close();
+      ok = ok.then((err) => {
+        if (err) throw err;
+        console.log('channel pub closed');
+        console.log('close channel sub');
+        return this._chSub.close();
       });
-      return conn.createChannel().then((ch) => {
-        let ok = ch.assertExchange('pubsub', 'fanout', { durable: false });
-
-        ok = ok.then(() => {
-          return ch.assertQueue('', { exclusive: true });
-        });
-
-        ok = ok.then((qok) => {
-          return ch.bindQueue(qok.queue, 'pubsub', '').then(() => {
-            return qok.queue;
-          });
-        });
-
-        ok = ok.then((queue) => {
-          return ch.consume(queue, logMessage, { noAck: true });
-        });
-
-        return ok.then(() => {
-          console.log(' [*] Waiting for message');
-          amqp.connect(amqpConfig.url).then((conn) => {
-            console.log("amqb pub connected successfull connected");
-            return when(conn.createChannel().then((ch) => {
-              callback(this);
-              let ex = 'pubsub';
-              let ok = ch.assertExchange(ex, 'fanout', { durable: false });
-
-              let message = 'Hello World';
-
-              return ok.then(() => {
-                ch.publish(ex, '', new Buffer(message));
-                console.log(" [x] Sent '%s'", message);
-                return ch.close();
-              });
-            })).ensure(() => {
-              conn.close();
-            });
-          }).then(null, console.warn);
-        });
-
-        function logMessage(msg) {
-          console.log(" [x] '%s'", msg.content.toString());
-        }
+      ok = ok.then((err) => {
+        if (err) throw err;
+        console.log('channel sub closed');
+        console.log('close connection pub');
+        return this._connPub.close();
       });
-    }).then(null, console.warn);
+      ok = ok.then((err) => {
+        if (err) throw err;
+        console.log('connection pub closed');
+        console.log('close connection sub');
+        return this._connSub.close();
+      });
+      ok.then((err) => {
+        if (err) throw err;
+        console.log('connection sub closed');
+        process.exit(0);
+      });
 
+
+    });
   }
 
-  get connection() {
-    return this._connection;
+  createSubChannel(callback, next) {
+    let amqpConfig = config.adapters.getConfig("queue");
+    amqp.connect(amqpConfig.url).then((conn) => {
+      this._connSub = conn;
+      console.log("amqb sub connected successfull connected");
+      return conn.createChannel().then((ch) => {
+        this._chSub = ch;
+        return next(callback);
+      });
+    }).then(null, console.warn);
+  }
+
+  createPubChannel(next) {
+    let amqpConfig = config.adapters.getConfig("queue");
+    amqp.connect(amqpConfig.url).then((conn) => {
+      this._connPub = conn;
+      console.log("amqb pub connected successfull connected");
+      return when(conn.createChannel().then((ch) => {
+        this._chPub = ch;
+        next();
+      }))/*.ensure(() => { console.log('closed!!!!!!!'); conn.close(); })*/;
+    }).then(null, console.warn);
+  }
+
+  get chSub() {
+    return this._chSub;
+  }
+
+  get chPub() {
+    return this._chPub;
   }
 }
