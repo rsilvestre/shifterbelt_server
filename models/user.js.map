@@ -1,0 +1,12 @@
+{
+  "version": 3,
+  "sources": [
+    "/Users/michaelsilvestre/git/shifterbelt/beta/models/user.es6"
+  ],
+  "names": [],
+  "mappings": ";;;;;;;;;;;;wBAIqB,UAAU;;;;AAE/B,IAAI,aAAa,GAAG,SAAhB,aAAa,CAAY,KAAK,EAAE;AAClC,MAAI,EAAE,GAAG,+CAA+C,CAAC;AACzD,SAAO,EAAE,CAAC,IAAI,CAAC,KAAK,CAAC,CAAA;CACtB,CAAC;;AAEF,IAAI,UAAU,GAAG,sBAAS,MAAM,CAAC;AAC/B,OAAK,EAAE;AACL,QAAI,EAAE,MAAM;AACZ,QAAI,EAAE,IAAI;AACV,UAAM,EAAE,IAAI;AACZ,YAAQ,EAAE,2BAA2B;AACrC,YAAQ,EAAE,CAAC,aAAa,EAAE,mCAAmC,CAAC;AAC9D,SAAK,EAAE,CAAC,+CAA+C,EAAE,mCAAmC,CAAC;GAC9F;AACD,WAAS,EAAE,EAAE,IAAI,EAAE,MAAM,EAAE,QAAQ,EAAE,IAAI,EAAE;AAC3C,UAAQ,EAAE,EAAE,IAAI,EAAE,MAAM,EAAE,QAAQ,EAAE,IAAI,EAAE;AAC1C,aAAW,EAAE,EAAE,IAAI,EAAE,MAAM,EAAE;AAC7B,WAAS,EAAE,CAAC;AACV,UAAM,EAAE,EAAE,IAAI,EAAE,MAAM,EAAE,QAAQ,EAAE,IAAI,EAAE;AACxC,UAAM,EAAE,EAAE,IAAI,EAAE,MAAM,EAAE,QAAQ,EAAE,IAAI,EAAE;AACxC,QAAI,EAAE,EAAE,IAAI,EAAE,MAAM,EAAE,QAAQ,EAAE,IAAI,EAAE;AACtC,YAAQ,EAAE,EAAE,IAAI,EAAE,MAAM,EAAE,QAAQ,EAAE,IAAI,EAAE;AAC1C,WAAO,EAAE,EAAE,IAAI,EAAE,MAAM,EAAE,QAAQ,EAAE,IAAI,EAAE;GAC1C,CAAC;AACF,WAAS,EAAE,EAAE,IAAI,EAAE,IAAI,EAAE,WAAS,IAAI,CAAC,GAAG,EAAE;CAC7C,CAAC,CAAC;;AAEH,UAAU,CAAC,KAAK,CAAC,EAAE,KAAK,EAAE,CAAC,EAAE,CAAC,CAAC;;AAExB,IAAI,IAAI,GAAG,sBAAS,KAAK,CAAC,MAAM,EAAE,UAAU,CAAC,CAAC;QAA1C,IAAI,GAAJ,IAAI",
+  "file": "user.js",
+  "sourcesContent": [
+    "/**\n * Created by michaelsilvestre on 24/04/15\n */\n\nimport mongoose from \"mongoose\";\n\nlet validateEmail = function(email) {\n  var re = /^\\w+([\\.-]?\\w+)*@\\w+([\\.-]?\\w+)*(\\.\\w{2,3})+$/;\n  return re.test(email)\n};\n\nlet userSchema = mongoose.Schema({\n  email: {\n    type: String,\n    trim: true,\n    unique: true,\n    required: 'Email address is required',\n    validate: [validateEmail, 'Please fill a valid email address'],\n    match: [/^\\w+([\\.-]?\\w+)*@\\w+([\\.-]?\\w+)*(\\.\\w{2,3})+$/, 'Please fill a valid email address']\n  },\n  firstname: { type: String, required: true },\n  lastname: { type: String, required: true },\n  phonenumber: { type: String },\n  addresses: [{\n    street: { type: String, required: true },\n    number: { type: String, required: true },\n    town: { type: String, required: true },\n    postcode: { type: String, required: true },\n    country: { type: String, required: true }\n  }],\n  createdAt: { type: Date, default: Date.now }\n});\n\nuserSchema.index({ email: 1 });\n\nexport let User = mongoose.model('User', userSchema);\n\n"
+  ]
+}
