@@ -254,11 +254,15 @@ ApplicationSchema.statics = {
           return value.key === data.key && value.passwd === data.password
         });
         cb(null, {
-          applicationId: result._id,
-          businessId: result.businessId,
-          macAddress: data.macAddress.replace(/:/g, ''),
-          strategy: result.strategy,
-          role: keys[0].role || ""
+          application: {
+            id: result._id,
+            businessId: result.businessId,
+            strategy: result.strategy
+          },
+          device: {
+            macAddress: data.macAddress.replace(/:/g, ''),
+            role: keys[0].role || ""
+          }
         });
       });
   }

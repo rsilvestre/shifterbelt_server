@@ -12,9 +12,7 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-function _interopRequireDefault(obj) {
-  return obj && obj.__esModule ? obj : { 'default': obj };
-}
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 var _mongoose = require('mongoose');
 
@@ -54,9 +52,9 @@ var Generator = function Generator(preSave) {
 
   var Application = _mongoose2['default'].model('Application');
 
-  this.businessId = function(cb) {
+  this.businessId = function (cb) {
     var businessId = makeSalt();
-    Application.find({ 'businessId': businessId }).select('businessId').exec(function(err, result) {
+    Application.find({ 'businessId': businessId }).select('businessId').exec(function (err, result) {
       if (err) return cb(err);
 
       if (result.length > 0) {
@@ -67,7 +65,7 @@ var Generator = function Generator(preSave) {
     });
   };
 
-  this.keys = function(cb) {
+  this.keys = function (cb) {
     'use strict';
 
     var keyGen = function keyGen(type) {
@@ -136,7 +134,7 @@ var ApplicationSchema = new Schema({
  * Pre-save hook
  */
 
-ApplicationSchema.pre('save', function(next) {
+ApplicationSchema.pre('save', function (next) {
   'use strict';
 
   if (!this.isNew) {
@@ -145,7 +143,7 @@ ApplicationSchema.pre('save', function(next) {
 
   var generator = new Generator(this);
 
-  generator.businessId(function() {
+  generator.businessId(function () {
     generator.keys(next);
   });
 });
@@ -170,12 +168,12 @@ ApplicationSchema.methods = {
 
     this.save(cb);
   }, /**
-   * Authenticate - check if the passwords are the same
-   *
-   * @param {String} plainText
-   * @return {Boolean}
-   * @api public
-   */
+     * Authenticate - check if the passwords are the same
+     *
+     * @param {String} plainText
+     * @return {Boolean}
+     * @api public
+     */
 
   authenticate: function authenticate(plainText) {
     return this.encryptPassword(plainText) === this.hashed_password;
@@ -243,22 +241,26 @@ ApplicationSchema.statics = {
    */
   authenticate: function authenticate(data, cb) {
     'use strict';
-    this.findOne({ businessId: data.applicationId }).exec(function(err, result) {
+    this.findOne({ businessId: data.applicationId }).exec(function (err, result) {
       if (err) {
         return cb(err);
       }
       if (!result) {
         return cb(new Error('There is no result'));
       }
-      var keys = result.keys.filter(function(value) {
+      var keys = result.keys.filter(function (value) {
         return value.key === data.key && value.passwd === data.password;
       });
       cb(null, {
-        applicationId: result._id,
-        businessId: result.businessId,
-        macAddress: data.macAddress.replace(/:/g, ''),
-        strategy: result.strategy,
-        role: keys[0].role || ''
+        application: {
+          id: result._id,
+          businessId: result.businessId,
+          strategy: result.strategy
+        },
+        device: {
+          macAddress: data.macAddress.replace(/:/g, ''),
+          role: keys[0].role || ''
+        }
       });
     });
   }

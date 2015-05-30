@@ -3,12 +3,10 @@
  */
 
 import { adapters } from "../adapters/absAdapter.js"
-import { LinkDevice } from "./message.js"
-import _ from "underscore"
-import mongoose from "mongoose"
-import getmac from "getmac"
+import { LinkDevice } from "../modules/message.js"
+import Authentication from "../modules/authentication.js"
 
-let Application = mongoose.model('Application');
+import _ from "underscore"
 
 export let authenticateInit = () => {
   let websocketAdapter = adapters.getAdapter("websocket");
@@ -19,8 +17,8 @@ export let authenticateInit = () => {
     //socket.emit('event', "first message");
 
     socket.on('authenticate', (data) => {
-      let authenticate = new Authenticate(data);
-      authenticate.checkAuthToken((err, success) => {
+      let authentication = new Authentication(data);
+      authentication.checkAuthToken((err, success) => {
         if (err) {
           return socket.emit('error', err);
         }
@@ -37,12 +35,26 @@ export let authenticateInit = () => {
         });
 
 
-        let linkDevice = new LinkDevice(device, socket, (err, queue) => {
+        let linkDevice = new LinkDevice(device, socket, (err, device, slaves) => {
           if (err) {
             return console.warn(err);
           }
-          queue.emit('authenticated');
-          queue.emit('message', { event: "first server message" });
+          socket.emit('authenticated');
+          socket.emit('message', { event: "first server message" });
+          socket.emit('service', {
+            action: 'identification',
+            content: { role: device['role'], status: 'connected', id: device['macAddress'] },
+            time: new Date()
+          });
+          if (slaves) {
+            socket.emit('service', {
+              action: 'slaveList',
+              content: Object.keys(slaves).map((value) => {
+                return { role: 'slave', status: 'connected', id: value }
+              }),
+              time: new Date()
+            });
+          }
         });
         socket.on('disconnect', () => {
           linkDevice.disconnect();
@@ -68,68 +80,3 @@ export let authenticateInit = () => {
   });
 };
 
-class Authenticate {
-  constructor(data) {
-    if (!data) {
-      return null;
-    }
-    this._data = JSON.parse(data);
-  }
-
-  checkAuthToken(callback) {
-
-    if (!this._data.hasOwnProperty('applicationId')) {
-      return callback(new Error("Missing applicationId for the authentification"), null);
-    }
-
-    if (!this._data.hasOwnProperty('key')) {
-      return callback(new Error("Missing key for the authentification"), null);
-    }
-
-    if (!this._data.hasOwnProperty('password')) {
-      return callback(new Error("Missing password for the authentification"), null);
-    }
-
-    if (!this._data.hasOwnProperty('macAddress')) {
-      return callback(new Error("Missing macAddress for the authentification"), null);
-    }
-
-    if (!_.isString(this._data['key'])) {
-      return callback(new Error("Key should be a string"), null);
-    }
-
-    if (this._data['key'].length !== 40) {
-      return callback(new Error("Key has not the good size"), null);
-    }
-
-    if (!_.isString(this._data['password'])) {
-      return callback(new Error("Password should be a string"), null);
-    }
-
-    if (this._data['password'].length !== 80) {
-      return callback(new Error("Password has not the good size"), null);
-    }
-
-    if (!_.isNumber(this._data['applicationId'])) {
-      return callback(new Error("ApplicationId should be a number"), null);
-    }
-
-    if (!getmac.isMac(this._data['macAddress'])) {
-      return callback(new Error("The mac address is not correctly formated"), null);
-    }
-
-    Application.authenticate(this._data, (err, result) => {
-      if (err) {
-        return callback(err, null);
-      }
-      if (!result) {
-        return callback(new Error("The applicationId are not correct"), null);
-      }
-      if (result.role === "") {
-        return callback(new Error("The key and password are not correct"), null);
-      }
-      console.log(result);
-      return callback(null, result);
-    });
-  }
-}
