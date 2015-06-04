@@ -1,16 +1,14 @@
+/**
+ * Created by michaelsilvestre on 24/04/15
+ */
+
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _interopRequireDefault = function(obj) {
-    return obj && obj.__esModule ? obj : { "default": obj };
-};
-
-/**
- * Created by michaelsilvestre on 24/04/15
- */
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 var _mongoose = require("mongoose");
 
@@ -22,7 +20,7 @@ var deviceSchema = _mongoose2["default"].Schema({
         required: "macAddress is required",
         unique: true,
         trim: true,
-        validate: [function(value) {
+        validate: [function (value) {
             return /[a-z0-9]{12}/.test(value);
         }, "Invalid Mac Address"],
         match: [/[a-z0-9]{12}/, "Please fill a valid Mac Address"]
@@ -42,8 +40,8 @@ var Device = _mongoose2["default"].model("Device", deviceSchema);
 exports.Device = Device;
 Device.schema.path("macAddress").validate();
 
-Device.schema.path("applications").validate(function(value) {
-    value.forEach(function(application) {
+Device.schema.path("applications").validate(function (value) {
+    value.forEach(function (application) {
         if (!/master|manager|slave/.test(application.role)) {
             return false;
         }

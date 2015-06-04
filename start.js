@@ -20,11 +20,27 @@ var _configLogsJs = require("./config/logs.js");
 
 var logConfig = _interopRequireWildcard(_configLogsJs);
 
+var _http = require("http");
+
+var _http2 = _interopRequireDefault(_http);
+
+var _socketioStickySession = require("socketio-sticky-session");
+
+var _socketioStickySession2 = _interopRequireDefault(_socketioStickySession);
+
 var logger = new _libLoggerJs2["default"]();
 logger.init(logConfig.config.logLevel, logConfig.config.path);
 
-var bootstrap = new _configBootstrapJs2["default"]();
-bootstrap.run();
+(0, _socketioStickySession2["default"])({ num: 1 }, function () {
+    var server = _http2["default"].createServer(function (req, res) {
+        res.writeHead(200);
+        res.writer("Thank you");
+        res.end();
+    });
+    var bootstrap = new _configBootstrapJs2["default"]();
+    bootstrap.run(server);
+    return server;
+}).listen(3000);
 
 //import Identify from './lib/identify.js'
 
