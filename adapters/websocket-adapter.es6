@@ -5,7 +5,7 @@
 import socketIo from "socket.io"
 import socketRedis from "socket.io-redis"
 import redis from "redis"
-import * as config from "../config/adapters.js"
+import * as config from "../config/config.js"
 import AbsAdapter from "./absAdapter.js"
 import _ from "underscore"
 

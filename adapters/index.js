@@ -1,49 +1,47 @@
+/**
+ * Created by michaelsilvestre on 19/04/15
+ */
+
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _interopRequireDefault = function(obj) {
-    return obj && obj.__esModule ? obj : { "default": obj };
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+var _mssqlAdapterJs = require("./mssql-adapter.js");
+
+var _mssqlAdapterJs2 = _interopRequireDefault(_mssqlAdapterJs);
+
+var _redisAdapterJs = require("./redis-adapter.js");
+
+var _redisAdapterJs2 = _interopRequireDefault(_redisAdapterJs);
+
+var _rabbitmqAdapterJs = require("./rabbitmq-adapter.js");
+
+var _rabbitmqAdapterJs2 = _interopRequireDefault(_rabbitmqAdapterJs);
+
+var _amqpAdapterJs = require("./amqp-adapter.js");
+
+var _amqpAdapterJs2 = _interopRequireDefault(_amqpAdapterJs);
+
+var _websocketAdapterJs = require("./websocket-adapter.js");
+
+var _websocketAdapterJs2 = _interopRequireDefault(_websocketAdapterJs);
+
+var _mongooseAdapterJs = require("./mongoose-adapter.js");
+
+var _mongooseAdapterJs2 = _interopRequireDefault(_mongooseAdapterJs);
+
+exports["default"] = {
+    mssqlAdapter: _mssqlAdapterJs2["default"],
+    redisAdapter: _redisAdapterJs2["default"],
+    rabbitAdapter: _rabbitmqAdapterJs2["default"],
+    amqpAdapter: _amqpAdapterJs2["default"],
+    wsAdapter: _websocketAdapterJs2["default"],
+    mongooseAdapter: _mongooseAdapterJs2["default"]
 };
-
-/**
- * Created by michaelsilvestre on 19/04/15
- */
-
-var _MssqlAdapter = require("./mssql-adapter.js");
-
-var _MssqlAdapter2 = _interopRequireDefault(_MssqlAdapter);
-
-var _RedisAdapter = require("./redis-adapter.js");
-
-var _RedisAdapter2 = _interopRequireDefault(_RedisAdapter);
-
-var _RabbitAdapter = require("./rabbitmq-adapter.js");
-
-var _RabbitAdapter2 = _interopRequireDefault(_RabbitAdapter);
-
-var _AmqpAdapter = require("./amqp-adapter.js");
-
-var _AmqpAdapter2 = _interopRequireDefault(_AmqpAdapter);
-
-var _WebsocketAdapter = require("./websocket-adapter.js");
-
-var _WebsocketAdapter2 = _interopRequireDefault(_WebsocketAdapter);
-
-var _MongooseAdapter = require("./mongoose-adapter.js");
-
-var _MongooseAdapter2 = _interopRequireDefault(_MongooseAdapter);
-
-var adapters = {
-    mssqlAdapter: _MssqlAdapter2["default"],
-    redisAdapter: _RedisAdapter2["default"],
-    rabbitAdapter: _RabbitAdapter2["default"],
-    amqpAdapter: _AmqpAdapter2["default"],
-    wsAdapter: _WebsocketAdapter2["default"],
-    mongooseAdapter: _MongooseAdapter2["default"]
-};
-exports.adapters = adapters;
+module.exports = exports["default"];
 
 //# sourceMappingURL=index.js.map

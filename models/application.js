@@ -112,13 +112,16 @@ var ApplicationSchema = new Schema({
   strategy: { type: String, required: 'The strategy has not been defined', 'enum': ['direct', 'work'] },
   users: [{
     user: { type: Schema.ObjectId, ref: 'User', required: true },
-    role: { type: String, required: true, 'enum': ['owner', 'manager', 'invited'] }
+    role: { type: String, required: true, 'enum': ['owner', 'manager', 'invited'] },
+    createdAt: { type: Date, 'default': Date.now }
   }],
   createdAt: { type: Date, 'default': Date.now },
   keys: [{
     role: { type: String, required: true, 'enum': ['master', 'manager', 'slave'] },
     key: { type: String, required: true },
-    passwd: { type: String, required: true }
+    passwd: { type: String, required: true },
+    createdAt: { type: Date, 'default': Date.now },
+    status: { type: String, 'default': 'active', 'enum': ['active', 'inactive', 'revoked'] }
   }]
 });
 

@@ -4,7 +4,7 @@
 
 import amqp from "amqplib"
 import when from "when"
-import * as config from "../config/adapters.js"
+import * as config from "../config/config.js"
 import AbsAdapter from "./absAdapter.js"
 
 export default class AmqpAdapter extends AbsAdapter {

@@ -1,0 +1,1 @@
+{"version":3,"sources":["config.es6"],"names":[],"mappings":";;;;;;;;;;;;0BAI0B,eAAe;;IAA7B,QAAQ;;qBAEL;AACb,MAAI,OAAK,SAAS,QAAK;AACvB,UAAQ,EAAG,QAAQ;CACpB","file":"config.js","sourcesContent":["/**\n * Created by michaelsilvestre on 4/06/15\n */\n\nimport * as adapters from \"./adapters.js\"\n\nexport default {\n  root: `${__dirname}/..`,\n  adapters : adapters\n};"]}

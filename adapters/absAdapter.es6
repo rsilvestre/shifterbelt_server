@@ -2,7 +2,7 @@
  * Created by michaelsilvestre on 19/04/15
  */
 
-import * as config from "../config/adapters.js"
+import * as config from "../config/config.js"
 import Logger from "../lib/logger.js"
 
 let log = new Logger();

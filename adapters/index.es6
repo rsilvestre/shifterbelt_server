@@ -9,7 +9,7 @@ import AmqpAdapter from "./amqp-adapter.js"
 import WebsocketAdapter from "./websocket-adapter.js"
 import MongooseAdapter from "./mongoose-adapter.js"
 
-export var adapters = {
+export default {
     mssqlAdapter: MssqlAdapter,
     redisAdapter: RedisAdapter,
     rabbitAdapter: RabbitAdapter,

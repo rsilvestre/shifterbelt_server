@@ -1,31 +1,29 @@
-"use strict";
-
-var _interopRequireWildcard = function (obj) { return obj && obj.__esModule ? obj : { "default": obj }; };
-
 /**
  * Created by michaelsilvestre on 19/04/15
  */
 
-var _App = require("./app");
+"use strict";
 
-var _App2 = _interopRequireWildcard(_App);
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
 
-var _Bootstrap = require("./lib/bootstrap.js");
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-var _Bootstrap2 = _interopRequireWildcard(_Bootstrap);
+var _configBootstrapJs = require("./config/bootstrap.js");
 
-var _Logger = require("./lib/logger.js");
+var _configBootstrapJs2 = _interopRequireDefault(_configBootstrapJs);
 
-var _Logger2 = _interopRequireWildcard(_Logger);
+var _libLoggerJs = require("./lib/logger.js");
 
-var _import = require("./config/logs.js");
+var _libLoggerJs2 = _interopRequireDefault(_libLoggerJs);
 
-var logConfig = _interopRequireWildcard(_import);
+var _configLogsJs = require("./config/logs.js");
 
-var logger = new _Logger2["default"]();
+var logConfig = _interopRequireWildcard(_configLogsJs);
+
+var logger = new _libLoggerJs2["default"]();
 logger.init(logConfig.config.logLevel, logConfig.config.path);
 
-var bootstrap = new _Bootstrap2["default"](_App2["default"]);
+var bootstrap = new _configBootstrapJs2["default"]();
 bootstrap.run();
 
 //import Identify from './lib/identify.js'

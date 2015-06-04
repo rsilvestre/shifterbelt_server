@@ -1,16 +1,16 @@
+/**
+ * Created by michaelsilvestre on 19/04/15
+ */
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
     value: true
 });
-/**
- * Created by michaelsilvestre on 19/04/15
- */
 var defaultValue = {
-    database: 'mongoose_local',
-    memory: 'redis',
-    queue: 'amqp',
-    websocket: 'socketIo'
+    'database': 'mongoose_local',
+    'memory': 'redis',
+    'queue': 'amqp',
+    'websocket': 'socketIo'
 };
 
 var config = {
@@ -79,7 +79,7 @@ var config = {
     }
 };
 
-var adapters = {
+exports['default'] = {
     getAdapterConfig: function getAdapterConfig(name) {
         if (!defaultValue.hasOwnProperty(name)) {
             return new Error('The adapter not contain a property name: ' + name);
@@ -106,6 +106,6 @@ var adapters = {
         return config.config;
     }
 };
-exports.adapters = adapters;
+module.exports = exports['default'];
 
 //# sourceMappingURL=adapters.js.map

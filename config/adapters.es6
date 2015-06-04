@@ -74,7 +74,7 @@ let config = {
     }
 };
 
-export var adapters = {
+export default {
     getAdapterConfig: function(name) {
         if (!defaultValue.hasOwnProperty(name)) {
             return new Error(`The adapter not contain a property name: ${name}`);
