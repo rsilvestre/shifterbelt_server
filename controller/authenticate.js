@@ -31,6 +31,7 @@ var authenticateInit = function authenticateInit() {
     //socket.emit('event', "first message");
 
     socket.on("authenticate", function (data) {
+      console.log("a device try to authenticate");
       var authentication = new _modulesAuthenticationJs2["default"](data);
       authentication.checkAuthToken(function (err, success) {
         if (err) {
@@ -84,7 +85,7 @@ var authenticateInit = function authenticateInit() {
         console.log("Disconnection socket: " + socket.id);
         socket.disconnect("unauthorized");
       }
-    }, 1000);
+    }, 10000);
 
     socket.on("disconnect", function () {
       console.log("a device is disconnected");

@@ -17,6 +17,7 @@ export let authenticateInit = () => {
     //socket.emit('event', "first message");
 
     socket.on('authenticate', (data) => {
+      console.log('a device try to authenticate');
       let authentication = new Authentication(data);
       authentication.checkAuthToken((err, success) => {
         if (err) {
@@ -71,7 +72,7 @@ export let authenticateInit = () => {
         console.log(`Disconnection socket: ${socket.id}`);
         socket.disconnect('unauthorized');
       }
-    }, 1000);
+    }, 10000);
 
     socket.on('disconnect', () => {
       console.log("a device is disconnected");

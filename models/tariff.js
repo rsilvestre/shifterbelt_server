@@ -27,7 +27,11 @@ var TariffSchema = new Schema({
   connection: { type: Number, required: "A number of connection should be setted" },
   message: { type: Number, requirde: "A number of message should be setted" },
   price: [{
-    value: { type: Number, required: "A price cannot be null", validate: [priceGreaterThanZero, "The price should be bigger than zero"] },
+    value: {
+      type: Number,
+      required: "A price cannot be null",
+      validate: [priceGreaterThanZero, "The price should be bigger than zero"]
+    },
     createdAt: { type: Date, "default": Date.now }
   }],
   createdAt: { type: Date, "default": Date.now }

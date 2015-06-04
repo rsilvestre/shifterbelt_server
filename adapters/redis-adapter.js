@@ -5,7 +5,7 @@
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+  value: true
 });
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -37,44 +37,44 @@ var _url = require("url");
 var _url2 = _interopRequireDefault(_url);
 
 var RedisAdapter = (function (_AbsAdapter) {
-    function RedisAdapter(callback) {
-        _classCallCheck(this, RedisAdapter);
+  function RedisAdapter(callback) {
+    _classCallCheck(this, RedisAdapter);
 
-        _get(Object.getPrototypeOf(RedisAdapter.prototype), "constructor", this).call(this, "memory");
-        this.init();
-        console.log("redis successfull connected");
-        callback(this);
+    _get(Object.getPrototypeOf(RedisAdapter.prototype), "constructor", this).call(this, "memory");
+    this.init();
+    console.log("redis successfull connected");
+    callback(this);
+  }
+
+  _inherits(RedisAdapter, _AbsAdapter);
+
+  _createClass(RedisAdapter, [{
+    key: "init",
+    value: function init() {
+      var redisConfig = config.adapters.getConfig("memory");
+      var redisURL = _url2["default"].parse(redisConfig.defaultUrl());
+
+      this._redisClient = _redis2["default"].createClient(redisURL.port, redisURL.hostname, { no_ready_check: true });
+
+      if (redisURL.auth) {
+        this._redisClient.auth(redisURL.auth.split(":")[1]);
+      }
+
+      this._redisClient.on("error", function (err) {
+        "use strict";
+
+        console.log("Error " + err);
+        log.info("Error " + err);
+      });
     }
+  }, {
+    key: "client",
+    get: function () {
+      return this._redisClient;
+    }
+  }]);
 
-    _inherits(RedisAdapter, _AbsAdapter);
-
-    _createClass(RedisAdapter, [{
-        key: "init",
-        value: function init() {
-            var redisConfig = config.adapters.getConfig("memory");
-            var redisURL = _url2["default"].parse(redisConfig.defaultUrl());
-
-            this._redisClient = _redis2["default"].createClient(redisURL.port, redisURL.hostname, { no_ready_check: true });
-
-            if (redisURL.auth) {
-                this._redisClient.auth(redisURL.auth.split(":")[1]);
-            }
-
-            this._redisClient.on("error", function (err) {
-                "use strict";
-
-                console.log("Error " + err);
-                log.info("Error " + err);
-            });
-        }
-    }, {
-        key: "client",
-        get: function () {
-            return this._redisClient;
-        }
-    }]);
-
-    return RedisAdapter;
+  return RedisAdapter;
 })(_absAdapterJs2["default"]);
 
 exports["default"] = RedisAdapter;

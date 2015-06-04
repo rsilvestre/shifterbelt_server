@@ -45,11 +45,11 @@ var _underscore = require("underscore");
 var _underscore2 = _interopRequireDefault(_underscore);
 
 var WebsocketAdapter = (function (_AbsAdapter) {
-  function WebsocketAdapter(callback) {
+  function WebsocketAdapter(server, callback) {
     _classCallCheck(this, WebsocketAdapter);
 
     _get(Object.getPrototypeOf(WebsocketAdapter.prototype), "constructor", this).call(this, "websocket");
-
+    this._server = server;
     this.init(callback);
   }
 
@@ -66,7 +66,7 @@ var WebsocketAdapter = (function (_AbsAdapter) {
 
       //io.adapter(socketRedis({ pubClient: pub, subClient: sub }));
 
-      this._io = (0, _socketIo2["default"])(websocketConfig.port);
+      this._io = _socketIo2["default"].listen(this._server);
       _underscore2["default"].each(this._io.nsps, function (nsp) {
         nsp.on("connection", function (socket) {
           if (socket.auth) {

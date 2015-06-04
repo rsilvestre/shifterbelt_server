@@ -5,7 +5,7 @@
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+  value: true
 });
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -33,42 +33,42 @@ var _absAdapterJs = require("./absAdapter.js");
 var _absAdapterJs2 = _interopRequireDefault(_absAdapterJs);
 
 var MssqlAdapter = (function (_AbsAdapter) {
-    function MssqlAdapter(callback) {
-        _classCallCheck(this, MssqlAdapter);
+  function MssqlAdapter(callback) {
+    _classCallCheck(this, MssqlAdapter);
 
-        _get(Object.getPrototypeOf(MssqlAdapter.prototype), "constructor", this).call(this, "database");
+    _get(Object.getPrototypeOf(MssqlAdapter.prototype), "constructor", this).call(this, "database");
 
-        this.init(callback);
+    this.init(callback);
+  }
+
+  _inherits(MssqlAdapter, _AbsAdapter);
+
+  _createClass(MssqlAdapter, [{
+    key: "init",
+    value: function init(callback) {
+      var _this = this;
+
+      var mssqlConfig = config.adapters.getConfig("database");
+      this._connection = _mssql2["default"].connect(mssqlConfig, function (err) {
+        if (err) throw err;
+        _this._mssql = _mssql2["default"];
+        console.log("mssql successfull connected");
+        callback(_this);
+      });
     }
+  }, {
+    key: "connection",
+    get: function () {
+      return this._connection;
+    }
+  }, {
+    key: "mssql",
+    get: function () {
+      return this._mssql;
+    }
+  }]);
 
-    _inherits(MssqlAdapter, _AbsAdapter);
-
-    _createClass(MssqlAdapter, [{
-        key: "init",
-        value: function init(callback) {
-            var _this = this;
-
-            var mssqlConfig = config.adapters.getConfig("database");
-            this._connection = _mssql2["default"].connect(mssqlConfig, function (err) {
-                if (err) throw err;
-                _this._mssql = _mssql2["default"];
-                console.log("mssql successfull connected");
-                callback(_this);
-            });
-        }
-    }, {
-        key: "connection",
-        get: function () {
-            return this._connection;
-        }
-    }, {
-        key: "mssql",
-        get: function () {
-            return this._mssql;
-        }
-    }]);
-
-    return MssqlAdapter;
+  return MssqlAdapter;
 })(_absAdapterJs2["default"]);
 
 exports["default"] = MssqlAdapter;

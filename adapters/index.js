@@ -5,7 +5,7 @@
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+  value: true
 });
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
@@ -35,12 +35,12 @@ var _mongooseAdapterJs = require("./mongoose-adapter.js");
 var _mongooseAdapterJs2 = _interopRequireDefault(_mongooseAdapterJs);
 
 exports["default"] = {
-    mssqlAdapter: _mssqlAdapterJs2["default"],
-    redisAdapter: _redisAdapterJs2["default"],
-    rabbitAdapter: _rabbitmqAdapterJs2["default"],
-    amqpAdapter: _amqpAdapterJs2["default"],
-    wsAdapter: _websocketAdapterJs2["default"],
-    mongooseAdapter: _mongooseAdapterJs2["default"]
+  mssqlAdapter: _mssqlAdapterJs2["default"],
+  redisAdapter: _redisAdapterJs2["default"],
+  rabbitAdapter: _rabbitmqAdapterJs2["default"],
+  amqpAdapter: _amqpAdapterJs2["default"],
+  wsAdapter: _websocketAdapterJs2["default"],
+  mongooseAdapter: _mongooseAdapterJs2["default"]
 };
 module.exports = exports["default"];
 

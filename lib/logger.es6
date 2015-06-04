@@ -19,43 +19,43 @@ import appRootPath from "app-root-path"
 export var log = null;
 
 export let logger = {
-    error: (value) => {
-        if (log instanceof Logger) {
-            log.error(value);
-        }
-    },
-    debug: (value) => {
-        if (log instanceof Logger) {
-            log.debug(value);
-        }
-    },
-    info: (value) => {
-        if (log instanceof Logger) {
-            log.info(value);
-        }
+  error: (value) => {
+    if (log instanceof Logger) {
+      log.error(value);
     }
+  },
+  debug: (value) => {
+    if (log instanceof Logger) {
+      log.debug(value);
+    }
+  },
+  info: (value) => {
+    if (log instanceof Logger) {
+      log.info(value);
+    }
+  }
 };
 
 export default class Logger {
-    constructor() {
-    }
+  constructor() {
+  }
 
-    init(logLevel, logFile) {
-        if (["error", "debug", "info"].indexOf(logLevel) == -1) {
-            return new Error(`The log level: ${logLevel}, not exist`);
-        }
-        log = new Log(logLevel, fs.createWriteStream(`${appRootPath}/log/${logFile}`));
+  init(logLevel, logFile) {
+    if (["error", "debug", "info"].indexOf(logLevel) == -1) {
+      return new Error(`The log level: ${logLevel}, not exist`);
     }
+    log = new Log(logLevel, fs.createWriteStream(`${appRootPath}/log/${logFile}`));
+  }
 
-    set error(value) {
-        log.error(value);
-    }
+  set error(value) {
+    log.error(value);
+  }
 
-    set debug(value) {
-        log.debug(value);
-    }
+  set debug(value) {
+    log.debug(value);
+  }
 
-    set info(value) {
-        log.info(value);
-    }
+  set info(value) {
+    log.info(value);
+  }
 }

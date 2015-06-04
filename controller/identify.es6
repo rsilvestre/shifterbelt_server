@@ -9,10 +9,10 @@ export let identityInit = () => {
   websocketAdapter.nsp.use((socket, next) => {
     let handshake = socket.handshake;
     if (!handshake.hasOwnProperty("query") && !handshake.query.hasOwnProperty("applicationId")) {
-      next(new Error("The query don't contain applicationId"));
+      return next(new Error("The query don't contain applicationId"));
     }
     if (!handshake.hasOwnProperty("address")) {
-      next(new Error("The query don't contain ipAddress"));
+      return next(new Error("The query don't contain ipAddress"));
     }
 
     let identify = new Identify(handshake.query.applicationId, handshake.address);
@@ -20,7 +20,7 @@ export let identityInit = () => {
     identify.checkIdentity((err, result) => {
       if (err) throw err;
       if (result instanceof Error) {
-        next(result.message);
+        return next(result.message);
       }
       next();
     });

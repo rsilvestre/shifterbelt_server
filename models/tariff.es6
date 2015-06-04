@@ -21,7 +21,11 @@ let TariffSchema = new Schema({
   connection: { type: Number, required: "A number of connection should be setted" },
   message: { type: Number, requirde: "A number of message should be setted" },
   price: [{
-    value: { type: Number, required: "A price cannot be null", validate:[ priceGreaterThanZero, "The price should be bigger than zero"] },
+    value: {
+      type: Number,
+      required: "A price cannot be null",
+      validate: [priceGreaterThanZero, "The price should be bigger than zero"]
+    },
     createdAt: { type: Date, default: Date.now }
   }],
   createdAt: { type: Date, default: Date.now }
@@ -41,7 +45,7 @@ TariffSchema.statics = {
   loadId: function(id, cb) {
     "use strict";
 
-    this.findOne({_id: id})
+    this.findOne({ _id: id })
       .exec(cb);
   },
 
@@ -53,7 +57,7 @@ TariffSchema.statics = {
   loadName: function(name, cb) {
     "use strict";
 
-    this.findOne({name: name})
+    this.findOne({ name: name })
       .exec(cb);
   },
 
@@ -75,7 +79,7 @@ TariffSchema.statics = {
   allNotFree: function(cb) {
     "use strict";
 
-    this.find({"price": {$elemMatch: {"value": {$gt: 0}}}}, {}, {sort: {"price.value":-1}})
+    this.find({ "price": { $elemMatch: { "value": { $gt: 0 } } } }, {}, { sort: { "price.value": -1 } })
       .exec(cb);
   },
 
@@ -86,7 +90,7 @@ TariffSchema.statics = {
   allFree: function(cb) {
     "use strict";
 
-    this.find({"price": {$elemMatch: {"value": {$eq: 0}}}})
+    this.find({ "price": { $elemMatch: { "value": { $eq: 0 } } } })
       .exec(cb);
   }
 };

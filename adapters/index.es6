@@ -10,10 +10,10 @@ import WebsocketAdapter from "./websocket-adapter.js"
 import MongooseAdapter from "./mongoose-adapter.js"
 
 export default {
-    mssqlAdapter: MssqlAdapter,
-    redisAdapter: RedisAdapter,
-    rabbitAdapter: RabbitAdapter,
-    amqpAdapter: AmqpAdapter,
-    wsAdapter: WebsocketAdapter,
-    mongooseAdapter: MongooseAdapter
+  mssqlAdapter: MssqlAdapter,
+  redisAdapter: RedisAdapter,
+  rabbitAdapter: RabbitAdapter,
+  amqpAdapter: AmqpAdapter,
+  wsAdapter: WebsocketAdapter,
+  mongooseAdapter: MongooseAdapter
 };

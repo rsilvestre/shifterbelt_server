@@ -10,9 +10,9 @@ import AbsAdapter from "./absAdapter.js"
 import _ from "underscore"
 
 export default class WebsocketAdapter extends AbsAdapter {
-  constructor(callback) {
+  constructor(server, callback) {
     super('websocket');
-
+    this._server = server;
     this.init(callback);
   }
 
@@ -25,7 +25,7 @@ export default class WebsocketAdapter extends AbsAdapter {
 
     //io.adapter(socketRedis({ pubClient: pub, subClient: sub }));
 
-    this._io = socketIo(websocketConfig.port);
+    this._io = socketIo.listen(this._server);
     _.each(this._io.nsps, (nsp) => {
       nsp.on('connection', (socket) => {
         if (socket.auth) {

@@ -8,33 +8,33 @@ import AbsAdapter from "./absAdapter.js"
 import url from "url"
 
 export default class RedisAdapter extends AbsAdapter {
-    constructor(callback) {
-        super("memory");
-        this.init();
-        console.log('redis successfull connected');
-        callback(this);
+  constructor(callback) {
+    super("memory");
+    this.init();
+    console.log('redis successfull connected');
+    callback(this);
+  }
+
+  init() {
+    let redisConfig = config.adapters.getConfig("memory");
+    var redisURL = url.parse(redisConfig.defaultUrl());
+
+    this._redisClient = redis.createClient(redisURL.port, redisURL.hostname, { no_ready_check: true });
+
+    if (redisURL.auth) {
+      this._redisClient.auth(redisURL.auth.split(":")[1]);
     }
 
-    init() {
-        let redisConfig = config.adapters.getConfig("memory");
-        var redisURL = url.parse(redisConfig.defaultUrl());
+    this._redisClient.on('error', function(err) {
+      "use strict";
 
-        this._redisClient = redis.createClient(redisURL.port, redisURL.hostname, {no_ready_check: true});
+      console.log('Error ' + err);
+      log.info('Error ' + err);
+    });
+  }
 
-        if (redisURL.auth) {
-            this._redisClient.auth(redisURL.auth.split(":")[1]);
-        }
-
-        this._redisClient.on('error', function(err) {
-            "use strict";
-
-            console.log('Error '+ err);
-            log.info('Error '+ err);
-        });
-    }
-
-    get client() {
-        return this._redisClient;
-    }
+  get client() {
+    return this._redisClient;
+  }
 
 }

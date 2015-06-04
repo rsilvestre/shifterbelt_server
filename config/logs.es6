@@ -3,7 +3,7 @@
  */
 
 export var config = {
-    logLevel: "debug",
-    path: "logger.log"
+  logLevel: "debug",
+  path: "logger.log"
 };
 

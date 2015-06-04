@@ -3,7 +3,7 @@
  */
 import { modelManager } from "./lib/model-manager.js"
 import { adapters } from "./adapters/absAdapter.js"
-import Controller from "./controller/index.js.js"
+import Controller from "./controller/index.js"
 
 export default class App {
   constructor() {

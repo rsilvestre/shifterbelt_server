@@ -51,18 +51,35 @@ var Bootstrap = (function () {
 
   _createClass(Bootstrap, [{
     key: "run",
-    value: function run() {
+    value: function run(server) {
       var App = require("" + _configJs2["default"].root + "/app.js");
-      var p = dbloader("database").then(function () {
-        return dbloader("memory");
-      }).then(function () {
-        return dbloader("queue");
-      }).then(function () {
-        return dbloader("websocket");
-      }).then(function () {
-
-        var app = new App();
+      new (_adaptersIndexJs2["default"][_configJs2["default"].adapters.getAdapter("database")])(function () {
+        new (_adaptersIndexJs2["default"][_configJs2["default"].adapters.getAdapter("memory")])(function () {
+          new (_adaptersIndexJs2["default"][_configJs2["default"].adapters.getAdapter("queue")])(function () {
+            new (_adaptersIndexJs2["default"][_configJs2["default"].adapters.getAdapter("websocket")])(server, function () {
+              new App();
+            });
+          });
+        });
       });
+
+      //websocket.io.listen(server);
+      /*
+       var p = dbloader("database")
+       .then(()=> {
+       return dbloader("memory");
+       })
+       .then(() => {
+       return dbloader("queue");
+       })
+       .then(() => {
+       return dbloader("websocket");
+       })
+       .then((x) => {
+       x.io.listen(server);
+       let app = new App();
+       });
+       */
     }
   }]);
 

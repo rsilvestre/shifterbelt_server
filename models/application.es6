@@ -111,7 +111,7 @@ let ApplicationSchema = new Schema({
     key: { type: String, required: true },
     passwd: { type: String, required: true },
     createdAt: { type: Date, default: Date.now },
-    status: { type: String, default: 'active', enum: ['active', 'inactive', 'revoked']}
+    status: { type: String, default: 'active', enum: ['active', 'inactive', 'revoked'] }
   }]
 });
 

@@ -27,22 +27,34 @@ export default class Bootstrap {
     });
   }
 
-  run() {
+  run(server) {
     let App = require(`${config.root}/app.js`);
-    var p = dbloader("database")
-      .then(()=> {
-        return dbloader("memory");
-      })
-      .then(() => {
-        return dbloader("queue");
-      })
-      .then(() => {
-        return dbloader("websocket");
-      })
-      .then(() => {
-
-        let app = new App();
-
+    new adapters[config.adapters.getAdapter("database")](function() {
+      new adapters[config.adapters.getAdapter("memory")](function() {
+        new adapters[config.adapters.getAdapter("queue")](function() {
+          new adapters[config.adapters.getAdapter("websocket")](server, function() {
+          });
+        })
       });
+    });
+
+
+    //websocket.io.listen(server);
+    /*
+     var p = dbloader("database")
+     .then(()=> {
+     return dbloader("memory");
+     })
+     .then(() => {
+     return dbloader("queue");
+     })
+     .then(() => {
+     return dbloader("websocket");
+     })
+     .then((x) => {
+     x.io.listen(server);
+     let app = new App();
+     });
+     */
   }
 }

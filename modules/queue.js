@@ -89,12 +89,12 @@ var Queue = (function () {
     key: 'registerWorkerQueue',
 
     /**
-    *
-    * @param {String} queue
-    * @param {Function} subMessage
-    * @param {Function} next
-    * @returns {{queue, exclusive, durable, autoDelete, arguments, passive, ticket, nowait}}
-    */
+     *
+     * @param {String} queue
+     * @param {Function} subMessage
+     * @param {Function} next
+     * @returns {{queue, exclusive, durable, autoDelete, arguments, passive, ticket, nowait}}
+     */
     value: function registerWorkerQueue(queue, subMessage, next) {
       var _this2 = this;
 

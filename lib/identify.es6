@@ -5,19 +5,19 @@
 import MssqlAdapter from "../adapters/mssql-adapter.js"
 
 export default class Identify {
-    constructor() {
-        this._adapter = new MssqlAdapter();
-        this._connection = this._adapter.connection;
-    }
+  constructor() {
+    this._adapter = new MssqlAdapter();
+    this._connection = this._adapter.connection;
+  }
 
-    user(callback) {
-        var mssql = this._connection;
+  user(callback) {
+    var mssql = this._connection;
 
-        var request = new mssql.Request();
+    var request = new mssql.Request();
 
-        request.execute('[dbo].[Users.SelectAll]', (err, record, returnValue) => {
-            if (err) return callback(err, null);
-            return callback(null, record);
-        });
-    }
+    request.execute('[dbo].[Users.SelectAll]', (err, record, returnValue) => {
+      if (err) return callback(err, null);
+      return callback(null, record);
+    });
+  }
 }

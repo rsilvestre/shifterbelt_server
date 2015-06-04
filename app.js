@@ -17,9 +17,9 @@ var _libModelManagerJs = require("./lib/model-manager.js");
 
 var _adaptersAbsAdapterJs = require("./adapters/absAdapter.js");
 
-var _controllerIndexJsJs = require("./controller/index.js.js");
+var _controllerIndexJs = require("./controller/index.js");
 
-var _controllerIndexJsJs2 = _interopRequireDefault(_controllerIndexJsJs);
+var _controllerIndexJs2 = _interopRequireDefault(_controllerIndexJs);
 
 var App = (function () {
   function App() {
@@ -32,7 +32,7 @@ var App = (function () {
     key: "init",
     value: function init() {
 
-      var controller = new _controllerIndexJsJs2["default"]();
+      var controller = new _controllerIndexJs2["default"]();
     }
   }, {
     key: "init_bak",
