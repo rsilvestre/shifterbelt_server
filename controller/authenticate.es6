@@ -20,7 +20,7 @@ export let authenticateInit = () => {
       let authentication = new Authentication(data);
       authentication.checkAuthToken((err, success) => {
         if (err) {
-          return socket.emit('error', err);
+          return socket.emit('error_system', err.message);
         }
         if (!success) {
           return;

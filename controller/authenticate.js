@@ -34,7 +34,7 @@ var authenticateInit = function authenticateInit() {
       var authentication = new _modulesAuthenticationJs2["default"](data);
       authentication.checkAuthToken(function (err, success) {
         if (err) {
-          return socket.emit("error", err);
+          return socket.emit("error_system", err.message);
         }
         if (!success) {
           return;
