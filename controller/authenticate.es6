@@ -74,7 +74,7 @@ export let authenticateInit = () => {
     }, 1000);
 
     socket.on('disconnect', () => {
-      console.log("a device is disconnected");
+      console.log(`a device: ${socket.id}, is disconnected`);
     })
 
   });

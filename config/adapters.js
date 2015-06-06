@@ -7,7 +7,7 @@ Object.defineProperty(exports, '__esModule', {
     value: true
 });
 var defaultValue = {
-    'database': 'mongoose_local',
+    'database': 'mongoose',
     'memory': 'redis',
     'queue': 'amqp',
     'websocket': 'socketIo'
@@ -27,16 +27,10 @@ var config = {
             }
         }
     },
-    mongoose_local: {
-        adapter: 'mongooseAdapter',
-        config: {
-            url: 'mongodb://localhost:27017/heroku_app31319631'
-        }
-    },
     mongoose: {
         adapter: 'mongooseAdapter',
         config: {
-            url: 'mongodb://heroku_app36294777:sm4tcjdlcnjh95l70jvn1ijc05@ds063769.mongolab.com:63769/heroku_app36294777'
+            url: process.env.MONGOHQ_URL || 'mongodb://localhost:27017/heroku_app31319631'
         }
     },
     redis: {
@@ -60,20 +54,20 @@ var config = {
     rabbitmq: {
         adapter: 'rabbitAdapter',
         config: {
-            url: 'amqp://sailmvbd:dUaYzF6Zzec7zIqH8r90ubfbVh-cohPa@bunny.cloudamqp.com/sailmvbd'
+            url: process.env.CLOUDAMQP_URL || 'amqp://localhost'
         }
     },
     amqp: {
         adapter: 'amqpAdapter',
         config: {
             //url: 'amqp://cutma1X1:aSSRFXC7_K5MvnwAGKrg3uZ7CMTCiTNt@swift-bluebell-30.bigwig.lshift.net:11068/0kFUqWJSIiki'
-            url: 'amqp://sailmvbd:dUaYzF6Zzec7zIqH8r90ubfbVh-cohPa@bunny.cloudamqp.com/sailmvbd'
+            url: process.env.CLOUDAMQP_URL || 'amqp://localhost'
         }
     },
     socketIo: {
         adapter: 'wsAdapter',
         config: {
-            port: 3000,
+            port: process.env.PORT || 3000,
             namespace: 'ns'
         }
     }

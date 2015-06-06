@@ -87,7 +87,7 @@ var authenticateInit = function authenticateInit() {
     }, 1000);
 
     socket.on("disconnect", function () {
-      console.log("a device is disconnected");
+      console.log("a device: " + socket.id + ", is disconnected");
     });
   });
 };
