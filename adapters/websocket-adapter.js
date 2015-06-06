@@ -44,6 +44,14 @@ var _underscore = require("underscore");
 
 var _underscore2 = _interopRequireDefault(_underscore);
 
+var _http = require("http");
+
+var _http2 = _interopRequireDefault(_http);
+
+var _url = require("url");
+
+var _url2 = _interopRequireDefault(_url);
+
 var WebsocketAdapter = (function (_AbsAdapter) {
   function WebsocketAdapter(callback) {
     _classCallCheck(this, WebsocketAdapter);
@@ -59,14 +67,29 @@ var WebsocketAdapter = (function (_AbsAdapter) {
     key: "init",
     value: function init(callback) {
       var websocketConfig = config.adapters.getConfig("websocket");
-      //let redisConfig = config.adapters.getConfig("memory");
+      var redisConfig = config.adapters.getConfig("memory");
 
-      //let pub = redis.createClient(redisConfig.port, redisConfig.host, { auth_pass: redisConfig.password });
-      //let sub = redis.createClient(redisConfig.port, redisConfig.host, { detect_buffers: true, auth_pass: redisConfig.password });
+      var redisURL = _url2["default"].parse(redisConfig.defaultUrl());
 
-      //io.adapter(socketRedis({ pubClient: pub, subClient: sub }));
+      var pub = _redis2["default"].createClient(redisURL.port, redisURL.hostname, { no_ready_check: true });
+      if (redisURL.auth) {
+        pub.auth(redisURL.auth.split(":")[1]);
+      }
 
-      this._io = (0, _socketIo2["default"])(websocketConfig.port);
+      var sub = _redis2["default"].createClient(redisURL.port, redisURL.hostname, { no_ready_check: true, detect_buffers: true });
+      if (redisURL.auth) {
+        sub.auth(redisURL.auth.split(":")[1]);
+      }
+
+      var server = _http2["default"].createServer(function (req, res) {
+        res.end("thank you");
+      });
+
+      this._io = _socketIo2["default"].listen(server);
+      this._io.adapter((0, _socketIoRedis2["default"])({ pubClient: pub, subClient: sub }));
+
+      server.listen(websocketConfig.port);
+
       _underscore2["default"].each(this._io.nsps, function (nsp) {
         nsp.on("connection", function (socket) {
           if (socket.auth) {

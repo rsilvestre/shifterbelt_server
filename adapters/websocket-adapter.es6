@@ -8,6 +8,8 @@ import redis from "redis"
 import * as config from "../config/config.js"
 import AbsAdapter from "./absAdapter.js"
 import _ from "underscore"
+import http from 'http'
+import url from 'url'
 
 export default class WebsocketAdapter extends AbsAdapter {
   constructor(callback) {
@@ -18,14 +20,29 @@ export default class WebsocketAdapter extends AbsAdapter {
 
   init(callback) {
     let websocketConfig = config.adapters.getConfig("websocket");
-    //let redisConfig = config.adapters.getConfig("memory");
+    let redisConfig = config.adapters.getConfig("memory");
 
-    //let pub = redis.createClient(redisConfig.port, redisConfig.host, { auth_pass: redisConfig.password });
-    //let sub = redis.createClient(redisConfig.port, redisConfig.host, { detect_buffers: true, auth_pass: redisConfig.password });
+    var redisURL = url.parse(redisConfig.defaultUrl());
 
-    //io.adapter(socketRedis({ pubClient: pub, subClient: sub }));
+    let pub = redis.createClient(redisURL.port, redisURL.hostname, { no_ready_check: true });
+    if (redisURL.auth) {
+      pub.auth(redisURL.auth.split(":")[1]);
+    }
 
-    this._io = socketIo(websocketConfig.port);
+    let sub = redis.createClient(redisURL.port, redisURL.hostname, { no_ready_check: true, detect_buffers: true });
+    if (redisURL.auth) {
+      sub.auth(redisURL.auth.split(":")[1]);
+    }
+
+    let server = http.createServer((req, res) => {
+      res.end('thank you');
+    });
+
+    this._io = socketIo.listen(server);
+    this._io.adapter(socketRedis({ pubClient: pub, subClient: sub }));
+
+    server.listen(websocketConfig.port);
+
     _.each(this._io.nsps, (nsp) => {
       nsp.on('connection', (socket) => {
         if (socket.auth) {
