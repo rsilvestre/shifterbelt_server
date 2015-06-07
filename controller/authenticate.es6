@@ -40,12 +40,12 @@ export let authenticateInit = () => {
             return console.warn(err);
           }
           socket.emit('authenticated');
-          socket.emit('message', { event: "first server message" });
           socket.emit('service', {
             action: 'identification',
             content: { role: device['role'], status: 'connected', id: device['macAddress'] },
             time: new Date()
           });
+          socket.emit('message', { event: "first server message" });
           if (slaves) {
             socket.emit('service', {
               action: 'slaveList',

@@ -37,7 +37,7 @@ export class LinkDevice {
 
   /**
    *
-   * @param {{}} list
+   * @param {Object} list
    * @param {{}} data
    * @param {Function} next
    */
@@ -139,7 +139,9 @@ export class LinkDevice {
             }
           }));
           socket.on('message', (message) => {
-            callback(message)
+            let messageObj = JSON.parse(message);
+            messageObj.slaveId = data['device']['macAddress'];
+            callback(JSON.stringify(messageObj));
           });
           next(null, data['device']);
         });

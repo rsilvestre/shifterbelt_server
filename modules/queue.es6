@@ -94,7 +94,7 @@ export default class Queue {
   /**
    *
    * @param {String} queue
-   * @param {String} keys
+   * @param {Array} keys
    * @param {Function} subMessage
    * @param {Function} next
    * @returns {{exchange}|{exchange, ticket, type, passive, durable, autoDelete, internal, nowait, arguments}}

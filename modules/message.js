@@ -61,7 +61,7 @@ var LinkDevice = (function () {
 
     /**
      *
-     * @param {{}} list
+     * @param {Object} list
      * @param {{}} data
      * @param {Function} next
      */
@@ -179,7 +179,9 @@ var LinkDevice = (function () {
               }
             }));
             socket.on("message", function (message) {
-              callback(message);
+              var messageObj = JSON.parse(message);
+              messageObj.slaveId = data["device"]["macAddress"];
+              callback(JSON.stringify(messageObj));
             });
             next(null, data["device"]);
           });
