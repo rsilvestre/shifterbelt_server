@@ -2,7 +2,7 @@
   "name": "shifterbelt-beta",
   "version": "1.0.0",
   "description": "make communication between devices working true",
-  "main": "start.js",
+  "main": "shifterbelt.js",
   "dependencies": {
     "amqplib": "^0.3.2",
     "app-root-path": "^1.0.0",

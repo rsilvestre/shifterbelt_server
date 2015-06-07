@@ -35,4 +35,4 @@ identify.user((err, result) => {
 });*/
 //let app = App();
 
-//# sourceMappingURL=start.js.map
+//# sourceMappingURL=shifterbelt.js.map
