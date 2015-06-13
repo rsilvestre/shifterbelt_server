@@ -24,14 +24,16 @@ var _underscore = require("underscore");
 
 var _underscore2 = _interopRequireDefault(_underscore);
 
-var masters = {};
-var managers = {};
-var slaves = {};
+var devicesContainer = {
+  masters: {},
+  managers: {},
+  slaves: {}
+};
 
 var LinkDevice = (function () {
   /**
    *
-   * @param {{}} data
+   * @param {Object} data
    * @param {socket.io} socket
    * @param {Function} callback
    */
@@ -61,16 +63,18 @@ var LinkDevice = (function () {
 
     /**
      *
-     * @param {Object} list
-     * @param {{}} data
+     * @param {Object} data
      * @param {Function} next
      */
-    value: function createIfNotExistListDevices(list, data, next) {
-      if (!list.hasOwnProperty(data["application"]["businessId"])) {
-        list[data["application"]["businessId"].toString()] = {};
+    value: function createIfNotExistListDevices(data, next) {
+      if (!devicesContainer.hasOwnProperty("" + data.device.role + "s")) {
+        return next(new Error("The container don't contain a object: " + data.device.role + "s"));
+      }
+      if (!devicesContainer["" + data.device.role + "s"].hasOwnProperty(data["application"]["businessId"])) {
+        devicesContainer["" + data.device.role + "s"][data["application"]["businessId"].toString()] = {};
         return next();
       }
-      if (list[data["application"]["businessId"]].hasOwnProperty(data["device"]["macAddress"])) {
+      if (devicesContainer["" + data.device.role + "s"][data["application"]["businessId"]].hasOwnProperty(data["device"]["macAddress"])) {
         return next(new Error("The queue: " + data["device"]["role"] + ", still contain a key: " + data["device"]["macAddress"]));
       }
       next();
@@ -80,8 +84,8 @@ var LinkDevice = (function () {
 
     /**
      *
-     * @param {{}} data
-     * @returns {{}}
+     * @param {Object} data
+     * @returns {Object}
      */
     value: function createFakeList(data) {
       var fakeList = {};
@@ -95,19 +99,19 @@ var LinkDevice = (function () {
 
     /**
      *
-     * @param {{}} data
+     * @param {Object} data
      * @param {socket.io} socket
      * @param {Function} next
      */
     value: function registerMaster(data, socket, next) {
       var _this = this;
 
-      this.createIfNotExistListDevices(masters, data, function (err) {
+      this.createIfNotExistListDevices(data, function (err) {
         if (err) {
           return next(err);
         }
 
-        masters["" + data["application"]["businessId"]]["" + data["device"]["macAddress"]] = _this;
+        devicesContainer.masters["" + data["application"]["businessId"]]["" + data["device"]["macAddress"]] = _this;
 
         _this.createSubQueue("pubsub", data["application"]["businessId"], _this.createFakeList(data), function () {
           console.log("" + data["device"]["macAddress"] + " has been added to the SubPub queue of the essaim " + data["application"]["businessId"]);
@@ -124,7 +128,7 @@ var LinkDevice = (function () {
               }
               return callback(chunk);
             });
-            next(null, data["device"], slaves["" + data["application"]["businessId"]] || {});
+            next(null, data["device"], devicesContainer.slaves["" + data["application"]["businessId"]] || {});
           });
         });
       });
@@ -134,18 +138,38 @@ var LinkDevice = (function () {
 
     /**
      *
-     * @param {{}} data
+     * @param {Object} data
      * @param {socket.io} socket
      * @param {Function} next
      */
     value: function registerManager(data, socket, next) {
       var _this2 = this;
 
-      this.createIfNotExistListDevices(managers, data, function (err) {
+      this.createIfNotExistListDevices(data, function (err) {
         if (err) {
           return next(err);
         }
-        managers["" + data["application"]["businessId"]]["" + data["device"]["macAddress"]] = _this2;
+
+        devicesContainer.managers["" + data["application"]["businessId"]]["" + data["device"]["macAddress"]] = _this2;
+
+        _this2.createSubQueue("pubsub", data["application"]["businessId"], _this2.createFakeList(data), function () {
+          console.log("" + data["device"]["macAddress"] + " has been added to the SubPub queue of the essaim " + data["application"]["businessId"]);
+          _this2._queue.registerSelectorQueue("topic", function (callback) {
+            _this2._send = callback;
+            socket.on("message", function (chunk) {
+              var _JSON$parse2 = JSON.parse(chunk);
+
+              var key = _JSON$parse2.key;
+              var message = _JSON$parse2.message;
+
+              if (message) {
+                return callback(message, key);
+              }
+              return callback(chunk);
+            });
+            next(null, data["device"], devicesContainer.slaves["" + data["application"]["businessId"]] || {});
+          });
+        });
       });
     }
   }, {
@@ -153,19 +177,19 @@ var LinkDevice = (function () {
 
     /**
      *
-     * @param {{}} data
+     * @param {Object} data
      * @param {socket.io} socket
      * @param {Function} next
      */
     value: function registerSlave(data, socket, next) {
       var _this3 = this;
 
-      this.createIfNotExistListDevices(slaves, data, function (err) {
+      this.createIfNotExistListDevices(data, function (err) {
         if (err) {
           return next(err);
         }
 
-        slaves["" + data["application"]["businessId"]]["" + data["device"]["macAddress"]] = _this3;
+        devicesContainer.slaves["" + data["application"]["businessId"]]["" + data["device"]["macAddress"]] = _this3;
 
         _this3.createTopicQueue("topic", data["application"]["businessId"], data["device"]["macAddress"], _this3.createFakeList(data), function () {
           console.log("" + data["device"]["macAddress"] + " has been added to the Topic queue of the essaim " + data["application"]["businessId"]);
@@ -195,7 +219,7 @@ var LinkDevice = (function () {
      *
      * @param {String} queue
      * @param {String} essaim
-     * @param {{}} list
+     * @param {Object} list
      * @param {Function} next
      */
     value: function createSubQueue(queue, essaim, list, next) {
@@ -212,10 +236,10 @@ var LinkDevice = (function () {
         _this4._queue.registerSubQueue(queue, function (message) {
           console.log("subQueue message: " + message.content.toString());
 
-          var _JSON$parse2 = JSON.parse(message.content.toString());
+          var _JSON$parse3 = JSON.parse(message.content.toString());
 
-          var type = _JSON$parse2.type;
-          var msg = _JSON$parse2.message;
+          var type = _JSON$parse3.type;
+          var msg = _JSON$parse3.message;
 
           if (!type) {
             return list[essaim][key].socket.emit("message", message);
@@ -236,7 +260,7 @@ var LinkDevice = (function () {
      * @param {string} queue
      * @param {String} essaim
      * @param {String} deviceId
-     * @param {{}} list
+     * @param {Object} list
      * @param {Function} next
      */
     value: function createTopicQueue(queue, essaim, deviceId, list, next) {
@@ -295,18 +319,20 @@ var LinkDevice = (function () {
 
     /**
      *
-     * @param {{}} list
      * @param {Function} done
      * @returns {*}
      */
-    value: function deleteDevice(list, done) {
+    value: function deleteDevice(done) {
       done = "function" === typeof done ? done : function (value) {
         return value;
       };
-      if (!list[this._data["application"]["businessId"]] || !list[this._data["application"]["businessId"]][this._data["device"]["macAddress"]]) {
+      if (!devicesContainer.hasOwnProperty("" + this._data.device.role + "s")) {
+        throw new Error("The deviceContainer don't contain a container: " + this._data.device.role + "s");
+      }
+      if (!devicesContainer["" + this._data.device.role + "s"][this._data["application"]["businessId"]] || !devicesContainer["" + this._data.device.role + "s"][this._data["application"]["businessId"]][this._data["device"]["macAddress"]]) {
         return done(new Error("Nothing to do"));
       }
-      delete list[this._data["application"]["businessId"]][this._data["device"]["macAddress"]];
+      delete devicesContainer["" + this._data.device.role + "s"][this._data["application"]["businessId"]][this._data["device"]["macAddress"]];
       console.log("device: " + [this._data["device"]["macAddress"]] + ", has been removed from: " + this._data["application"]["businessId"]);
       return done();
     }
@@ -322,7 +348,7 @@ var LinkDevice = (function () {
 
       this._queue.close("pubsub", "", function () {
         console.log("queue for master: " + _this6._data["device"]["macAddress"] + ", has been unbinded");
-        _this6.deleteDevice(masters, done);
+        _this6.deleteDevice(done);
       });
     }
   }, {
@@ -337,7 +363,7 @@ var LinkDevice = (function () {
 
       this._queue.close("pubsub", this._data["device"]["macAddress"], function () {
         console.log("queue for manager: " + _this7._data["device"]["macAddress"] + ", has been unbinded");
-        _this7.deleteDevice(managers, done);
+        _this7.deleteDevice(done);
       });
     }
   }, {
@@ -354,34 +380,36 @@ var LinkDevice = (function () {
         console.log("queue for slave " + _this8._data["device"]["macAddress"] + ", has been removed from masters and managers");
         _this8._queue.close("topic", _this8._data["device"]["macAddress"], function () {
           console.log("queue for slave: " + _this8._data["device"]["macAddress"] + ", has been unbinded");
-          _this8.deleteDevice(slaves, done);
+          _this8.deleteDevice(done);
         });
       };
 
-      var timeout = 20,
-          interval = setInterval(function () {
+      //let timeout = 20;
+      //let interval = setInterval(() => {
 
-        console.log("click");
+      //console.log('click');
 
-        if (_this8._send) {
-          stopFunction();
-          _this8._send(JSON.stringify({
-            type: "service", message: {
-              action: "slaveDisconnected",
-              content: { role: "slave", status: "disconnected", id: _this8._data["device"]["macAddress"] },
-              time: new Date()
-            }
-          }), beforeClose);
-        }
-        if (--timeout < 1) {
-          stopFunction();
-          return next();
-        }
-      }, 1000);
-
-      function stopFunction() {
-        clearInterval(interval);
+      if (this._send) {
+        //stopFunction();
+        return this._send(JSON.stringify({
+          type: "service", message: {
+            action: "slaveDisconnected",
+            content: { role: "slave", status: "disconnected", id: this._data["device"]["macAddress"] },
+            time: new Date()
+          }
+        }), beforeClose);
       }
+
+      return beforeClose();
+      //if (--timeout < 1) {
+      //  stopFunction();
+      //  return done();
+      //}
+      //}, 1000);
+
+      //function stopFunction() {
+      //  clearInterval(interval);
+      //}
     }
   }]);
 

@@ -70,7 +70,12 @@ var authenticateInit = function authenticateInit() {
           }
         });
         socket.on("disconnect", function () {
-          linkDevice.disconnect();
+          linkDevice.disconnect(function (err) {
+            if (err) {
+              return console.log(err.message);
+            }
+            console.log("device disconnected, can be unlocked");
+          });
         });
       });
     });

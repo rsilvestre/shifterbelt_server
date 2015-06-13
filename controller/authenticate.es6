@@ -57,7 +57,12 @@ export let authenticateInit = () => {
           }
         });
         socket.on('disconnect', () => {
-          linkDevice.disconnect();
+          linkDevice.disconnect((err) => {
+            if (err) {
+              return console.log(err.message);
+            }
+            console.log('device disconnected, can be unlocked');
+          });
         })
       });
     });

@@ -2,6 +2,7 @@
  * Created by michaelsilvestre on 19/04/15
  */
 
+//import MssqlAdapter from "./mssql-adapter.js"
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -9,10 +10,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-var _mssqlAdapterJs = require("./mssql-adapter.js");
-
-var _mssqlAdapterJs2 = _interopRequireDefault(_mssqlAdapterJs);
 
 var _redisAdapterJs = require("./redis-adapter.js");
 
@@ -35,9 +32,9 @@ var _mongooseAdapterJs = require("./mongoose-adapter.js");
 var _mongooseAdapterJs2 = _interopRequireDefault(_mongooseAdapterJs);
 
 exports["default"] = {
-    mssqlAdapter: _mssqlAdapterJs2["default"],
+    //mssqlAdapter: MssqlAdapter,
     redisAdapter: _redisAdapterJs2["default"],
-    rabbitAdapter: _rabbitmqAdapterJs2["default"],
+    //rabbitAdapter: RabbitAdapter,
     amqpAdapter: _amqpAdapterJs2["default"],
     wsAdapter: _websocketAdapterJs2["default"],
     mongooseAdapter: _mongooseAdapterJs2["default"]
