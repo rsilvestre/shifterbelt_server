@@ -3,6 +3,7 @@
  */
 
 //import MssqlAdapter from "./mssql-adapter.js"
+//import RabbitAdapter from "./rabbitmq-adapter.js"
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -14,10 +15,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "d
 var _redisAdapterJs = require("./redis-adapter.js");
 
 var _redisAdapterJs2 = _interopRequireDefault(_redisAdapterJs);
-
-var _rabbitmqAdapterJs = require("./rabbitmq-adapter.js");
-
-var _rabbitmqAdapterJs2 = _interopRequireDefault(_rabbitmqAdapterJs);
 
 var _amqpAdapterJs = require("./amqp-adapter.js");
 
@@ -33,8 +30,8 @@ var _mongooseAdapterJs2 = _interopRequireDefault(_mongooseAdapterJs);
 
 exports["default"] = {
     //mssqlAdapter: MssqlAdapter,
-    redisAdapter: _redisAdapterJs2["default"],
     //rabbitAdapter: RabbitAdapter,
+    redisAdapter: _redisAdapterJs2["default"],
     amqpAdapter: _amqpAdapterJs2["default"],
     wsAdapter: _websocketAdapterJs2["default"],
     mongooseAdapter: _mongooseAdapterJs2["default"]
