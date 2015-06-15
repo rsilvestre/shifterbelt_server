@@ -32,8 +32,8 @@ export default class RabbitAdapter extends AbsAdapter {
       this._sub.on('data', (note) => {
         "use strict";
 
-        console.log(`Alarum! '${note}`);
-        logger.info(`Alarum! '${note}`);
+        console.log(`Alarum! '${note}'`);
+        logger.info(`Alarum! '${note}'`);
       });
 
       this._sub.connect('events', () => {

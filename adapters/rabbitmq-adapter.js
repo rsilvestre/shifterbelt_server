@@ -67,8 +67,8 @@ var RabbitAdapter = (function (_AbsAdapter) {
         _this._sub.on("data", function (note) {
           "use strict";
 
-          console.log("Alarum! '" + note);
-          _libLoggerJs.logger.info("Alarum! '" + note);
+          console.log("Alarum! '" + note + "'");
+          _libLoggerJs.logger.info("Alarum! '" + note + "'");
         });
 
         _this._sub.connect("events", function () {

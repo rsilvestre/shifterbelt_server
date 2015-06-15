@@ -28,21 +28,22 @@ export let authenticateInit = () => {
           return;
         }
         device = success;
-        console.log(`Authenticated socket: ${socket.id}`);
-        logger.info(`Authenticated socket: ${socket.id}`);
-        socket.auth = true;
-
-        _.each(websocketAdapter.io.nsps, (nsp) => {
-          console.log(`restoring socket to: ${nsp.name}`);
-          logger.info(`restoring socket to: ${nsp.name}`);
-          nsp.connected[socket.id] = socket;
-        });
-
 
         let linkDevice = new LinkDevice(device, socket, (err, device, slaves) => {
           if (err) {
             return console.warn(err);
           }
+
+          console.log(`Authenticated socket: ${socket.id}`);
+          logger.info(`Authenticated socket: ${socket.id}`);
+          socket.auth = true;
+
+          _.each(websocketAdapter.io.nsps, (nsp) => {
+            console.log(`restoring socket to: ${nsp.name}`);
+            logger.info(`restoring socket to: ${nsp.name}`);
+            nsp.connected[socket.id] = socket;
+          });
+
           socket.emit('authenticated');
           socket.emit('service', {
             action: 'identification',
