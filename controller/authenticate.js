@@ -43,22 +43,20 @@ var authenticateInit = function authenticateInit() {
           return;
         }
         device = success;
+        console.log("Authenticated socket: " + socket.id);
+        _libLoggerJs.logger.info("Authenticated socket: " + socket.id);
+        socket.auth = true;
+
+        _underscore2["default"].each(websocketAdapter.io.nsps, function (nsp) {
+          console.log("restoring socket to: " + nsp.name);
+          _libLoggerJs.logger.info("restoring socket to: " + nsp.name);
+          nsp.connected[socket.id] = socket;
+        });
 
         var linkDevice = new _modulesMessageJs.LinkDevice(device, socket, function (err, device, slaves) {
           if (err) {
             return console.warn(err);
           }
-
-          console.log("Authenticated socket: " + socket.id);
-          _libLoggerJs.logger.info("Authenticated socket: " + socket.id);
-          socket.auth = true;
-
-          _underscore2["default"].each(websocketAdapter.io.nsps, function (nsp) {
-            console.log("restoring socket to: " + nsp.name);
-            _libLoggerJs.logger.info("restoring socket to: " + nsp.name);
-            nsp.connected[socket.id] = socket;
-          });
-
           socket.emit("authenticated");
           socket.emit("service", {
             action: "identification",
