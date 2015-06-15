@@ -4,6 +4,7 @@
 import { modelManager } from "./lib/model-manager.js"
 import { adapters } from "./adapters/absAdapter.js"
 import Controller from "./controller/index.js.js"
+import { logger } from "./lib/logger.js"
 
 export default class App {
   constructor() {
@@ -13,6 +14,7 @@ export default class App {
   init() {
 
     let controller = new Controller();
+    logger.info("Shifterbelt started");
 
   }
 
@@ -26,6 +28,7 @@ export default class App {
         applications[value["ApplicationId"]] = modelManager.instanciate("Application", value['ApplicationName']);
       });
       console.log(applications);
+      logger.info(applications);
       mssqlAdapter.connection.close();
     };
     let mssql = mssqlAdapter.mssql;
@@ -37,6 +40,7 @@ export default class App {
       return callback(null, records);
     });
     //console.log(mssqlAdapter.mssql);
+    //logger.info(mssqlAdapter.mssql);
   }
 }
 

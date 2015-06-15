@@ -5,6 +5,7 @@
 import rabbit from "rabbit.js"
 import * as config from "../config/config.js"
 import AbsAdapter from "./absAdapter.js"
+import { logger } from "../lib/logger.js"
 
 export default class RabbitAdapter extends AbsAdapter {
   constructor(callback) {
@@ -23,6 +24,7 @@ export default class RabbitAdapter extends AbsAdapter {
       "use strict";
 
       console.log('rabbit successfull connected');
+      logger.info('rabbit successfull connected');
       this._pub = this._context.socket('PUB');
       this._sub = this._context.socket('SUB');
       //sub.pipe(process.stdout);
@@ -30,8 +32,8 @@ export default class RabbitAdapter extends AbsAdapter {
       this._sub.on('data', (note) => {
         "use strict";
 
-        console.log("Alarum! %s", note);
-        log.info("Alarum! %s", note);
+        console.log(`Alarum! '${note}`);
+        logger.info(`Alarum! '${note}`);
       });
 
       this._sub.connect('events', () => {

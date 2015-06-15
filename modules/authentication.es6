@@ -4,6 +4,7 @@
 
 import mongoose from "mongoose"
 import getmac from "getmac"
+import { logger } from "../lib/logger.js"
 
 import _ from "underscore"
 
@@ -70,6 +71,7 @@ export default class Authentication {
         return callback(new Error("The key and password are not correct"), null);
       }
       console.log(result);
+      logger.info(result);
       return callback(null, result);
     });
   }

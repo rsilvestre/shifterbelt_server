@@ -10,6 +10,7 @@ import AbsAdapter from "./absAdapter.js"
 import _ from "underscore"
 import http from 'http'
 import url from 'url'
+import { logger } from "../lib/logger.js"
 
 export default class WebsocketAdapter extends AbsAdapter {
   constructor(callback) {
@@ -47,12 +48,14 @@ export default class WebsocketAdapter extends AbsAdapter {
       nsp.on('connection', (socket) => {
         if (socket.auth) {
           console.log(`removing socket from: ${nsp.name}`);
+          logger.info(`removing socket from: ${nsp.name}`);
           delete nsp.connected[socket.id];
         }
       });
     });
     this._nsp = this._io.of(websocketConfig.namespace);
     console.log('socket.io successfull connected');
+    logger.info('socket.io successfull connected');
     callback(this);
   }
 

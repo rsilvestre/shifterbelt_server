@@ -24,6 +24,8 @@ var _underscore = require("underscore");
 
 var _underscore2 = _interopRequireDefault(_underscore);
 
+var _libLoggerJs = require("../lib/logger.js");
+
 var devicesContainer = {
   masters: {},
   managers: {},
@@ -47,6 +49,7 @@ var LinkDevice = (function () {
     this._send = null;
     var action = "register" + data["device"]["role"].charAt(0).toUpperCase() + "" + data["device"]["role"].slice(1);
     console.log("action: " + action);
+    _libLoggerJs.logger.info("action: " + action);
 
     //if (!this.hasOwnProperty(action)) {
     //  throw new Error(`The property: ${action}, not exist`);
@@ -115,6 +118,7 @@ var LinkDevice = (function () {
 
         _this.createSubQueue("pubsub", data["application"]["businessId"], _this.createFakeList(data), function () {
           console.log("" + data["device"]["macAddress"] + " has been added to the SubPub queue of the essaim " + data["application"]["businessId"]);
+          _libLoggerJs.logger.info("" + data["device"]["macAddress"] + " has been added to the SubPub queue of the essaim " + data["application"]["businessId"]);
           _this._queue.registerSelectorQueue("topic", function (callback) {
             _this._send = callback;
             socket.on("message", function (chunk) {
@@ -154,6 +158,7 @@ var LinkDevice = (function () {
 
         _this2.createSubQueue("pubsub", data["application"]["businessId"], _this2.createFakeList(data), function () {
           console.log("" + data["device"]["macAddress"] + " has been added to the SubPub queue of the essaim " + data["application"]["businessId"]);
+          _libLoggerJs.logger.info("" + data["device"]["macAddress"] + " has been added to the SubPub queue of the essaim " + data["application"]["businessId"]);
           _this2._queue.registerSelectorQueue("topic", function (callback) {
             _this2._send = callback;
             socket.on("message", function (chunk) {
@@ -193,6 +198,7 @@ var LinkDevice = (function () {
 
         _this3.createTopicQueue("topic", data["application"]["businessId"], data["device"]["macAddress"], _this3.createFakeList(data), function () {
           console.log("" + data["device"]["macAddress"] + " has been added to the Topic queue of the essaim " + data["application"]["businessId"]);
+          _libLoggerJs.logger.info("" + data["device"]["macAddress"] + " has been added to the Topic queue of the essaim " + data["application"]["businessId"]);
           _this3._queue.registerPubQueue("pubsub", function (callback) {
             _this3._send = callback;
             callback(JSON.stringify({
@@ -235,6 +241,7 @@ var LinkDevice = (function () {
       keys.forEach(function (key) {
         _this4._queue.registerSubQueue(queue, function (message) {
           console.log("subQueue message: " + message.content.toString());
+          _libLoggerJs.logger.info("subQueue message: " + message.content.toString());
 
           var _JSON$parse3 = JSON.parse(message.content.toString());
 
@@ -276,6 +283,7 @@ var LinkDevice = (function () {
       keys.forEach(function (key) {
         _this5._queue.registerTopicQueue(queue, ["broadcast", deviceId], function (message) {
           console.log("topicQueue message: " + message.content.toString());
+          _libLoggerJs.logger.info("topicQueue message: " + message.content.toString());
           list[essaim][key].socket.emit("message", message);
         }, function () {
           if (--numKey === 0) {
@@ -304,6 +312,7 @@ var LinkDevice = (function () {
     value: function disconnect(done) {
       var action = "disconnectFrom" + this._data["device"]["role"].charAt(0).toUpperCase() + "" + this._data["device"]["role"].slice(1);
       console.log("action: " + action);
+      _libLoggerJs.logger.info("action: " + action);
 
       //if (!this.hasOwnProperty(action)) {
       //  throw new Error(`The property: ${action}, not exist`);
@@ -334,6 +343,7 @@ var LinkDevice = (function () {
       }
       delete devicesContainer["" + this._data.device.role + "s"][this._data["application"]["businessId"]][this._data["device"]["macAddress"]];
       console.log("device: " + [this._data["device"]["macAddress"]] + ", has been removed from: " + this._data["application"]["businessId"]);
+      _libLoggerJs.logger.info("device: " + [this._data["device"]["macAddress"]] + ", has been removed from: " + this._data["application"]["businessId"]);
       return done();
     }
   }, {
@@ -348,6 +358,7 @@ var LinkDevice = (function () {
 
       this._queue.close("pubsub", "", function () {
         console.log("queue for master: " + _this6._data["device"]["macAddress"] + ", has been unbinded");
+        _libLoggerJs.logger.info("queue for master: " + _this6._data["device"]["macAddress"] + ", has been unbinded");
         _this6.deleteDevice(done);
       });
     }
@@ -363,6 +374,7 @@ var LinkDevice = (function () {
 
       this._queue.close("pubsub", this._data["device"]["macAddress"], function () {
         console.log("queue for manager: " + _this7._data["device"]["macAddress"] + ", has been unbinded");
+        _libLoggerJs.logger.info("queue for manager: " + _this7._data["device"]["macAddress"] + ", has been unbinded");
         _this7.deleteDevice(done);
       });
     }
@@ -378,8 +390,10 @@ var LinkDevice = (function () {
 
       var beforeClose = function beforeClose() {
         console.log("queue for slave " + _this8._data["device"]["macAddress"] + ", has been removed from masters and managers");
+        _libLoggerJs.logger.info("queue for slave " + _this8._data["device"]["macAddress"] + ", has been removed from masters and managers");
         _this8._queue.close("topic", _this8._data["device"]["macAddress"], function () {
           console.log("queue for slave: " + _this8._data["device"]["macAddress"] + ", has been unbinded");
+          _libLoggerJs.logger.info("queue for slave: " + _this8._data["device"]["macAddress"] + ", has been unbinded");
           _this8.deleteDevice(done);
         });
       };
@@ -388,6 +402,7 @@ var LinkDevice = (function () {
       //let interval = setInterval(() => {
 
       //console.log('click');
+      //logger.info('click');
 
       if (this._send) {
         //stopFunction();

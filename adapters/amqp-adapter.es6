@@ -6,6 +6,7 @@ import amqp from "amqplib"
 import when from "when"
 import * as config from "../config/config.js"
 import AbsAdapter from "./absAdapter.js"
+import { logger } from "../lib/logger.js"
 
 export default class AmqpAdapter extends AbsAdapter {
   constructor(callback) {
@@ -27,29 +28,38 @@ export default class AmqpAdapter extends AbsAdapter {
 
     process.once('SIGINT', () => {
       console.log('Got SIGINT.  Press Control-D to exit.');
-      console.log('close channel pub');
+      logger.info('Got SIGINT.  Press Control-D to exit.');
+      console.log('close channel pub');;
+      logger.info('close channel pub');
       let ok = this._chPub.close();
       ok = ok.then((err) => {
         if (err) throw err;
         console.log('channel pub closed');
+        logger.info('channel pub closed');
         console.log('close channel sub');
+        logger.info('close channel sub');
         return this._chSub.close();
       });
       ok = ok.then((err) => {
         if (err) throw err;
         console.log('channel sub closed');
+        logger.info('channel sub closed');
         console.log('close connection pub');
+        logger.info('close connection pub');
         return this._connPub.close();
       });
       ok = ok.then((err) => {
         if (err) throw err;
         console.log('connection pub closed');
+        logger.info('connection pub closed');
         console.log('close connection sub');
+        logger.info('close connection sub');
         return this._connSub.close();
       });
       ok.then((err) => {
         if (err) throw err;
         console.log('connection sub closed');
+        logger.info('connection sub closed');
         process.exit(0);
       });
 
@@ -62,6 +72,7 @@ export default class AmqpAdapter extends AbsAdapter {
     amqp.connect(amqpConfig.url).then((conn) => {
       this._connSub = conn;
       console.log("amqb sub connected successfull connected");
+      logger.info("amqb sub connected successfull connected");
       return conn.createChannel().then((ch) => {
         this._chSub = ch;
         return next(callback);
@@ -74,10 +85,11 @@ export default class AmqpAdapter extends AbsAdapter {
     amqp.connect(amqpConfig.url).then((conn) => {
       this._connPub = conn;
       console.log("amqb pub connected successfull connected");
+      logger.info("amqb pub connected successfull connected");
       return when(conn.createChannel().then((ch) => {
         this._chPub = ch;
         next();
-      }))/*.ensure(() => { console.log('closed!!!!!!!'); conn.close(); })*/;
+      }))
     }).then(null, console.warn);
   }
 

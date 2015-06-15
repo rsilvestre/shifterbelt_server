@@ -22,6 +22,8 @@ var _getmac = require("getmac");
 
 var _getmac2 = _interopRequireDefault(_getmac);
 
+var _libLoggerJs = require("../lib/logger.js");
+
 var _underscore = require("underscore");
 
 var _underscore2 = _interopRequireDefault(_underscore);
@@ -93,6 +95,7 @@ var Authentication = (function () {
           return callback(new Error("The key and password are not correct"), null);
         }
         console.log(result);
+        _libLoggerJs.logger.info(result);
         return callback(null, result);
       });
     }

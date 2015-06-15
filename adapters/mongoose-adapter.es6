@@ -5,6 +5,7 @@
 import mongoose from "mongoose"
 import * as config from "../config/config.js"
 import AbsAdapter from "./absAdapter.js"
+import { logger } from "../lib/logger.js"
 
 export default class MongooseAdapter extends AbsAdapter {
   constructor(callback) {
@@ -22,6 +23,7 @@ export default class MongooseAdapter extends AbsAdapter {
     this._db = this._mongoose.connection;
     this._db.once('open', () => {
       console.log('mongoose successfull connected');
+      logger.info('mongoose successfull connected');
       callback(this);
     });
   }

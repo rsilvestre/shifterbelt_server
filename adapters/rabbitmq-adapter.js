@@ -32,6 +32,8 @@ var _absAdapterJs = require("./absAdapter.js");
 
 var _absAdapterJs2 = _interopRequireDefault(_absAdapterJs);
 
+var _libLoggerJs = require("../lib/logger.js");
+
 var RabbitAdapter = (function (_AbsAdapter) {
   function RabbitAdapter(callback) {
     _classCallCheck(this, RabbitAdapter);
@@ -57,6 +59,7 @@ var RabbitAdapter = (function (_AbsAdapter) {
         "use strict";
 
         console.log("rabbit successfull connected");
+        _libLoggerJs.logger.info("rabbit successfull connected");
         _this._pub = _this._context.socket("PUB");
         _this._sub = _this._context.socket("SUB");
         //sub.pipe(process.stdout);
@@ -64,8 +67,8 @@ var RabbitAdapter = (function (_AbsAdapter) {
         _this._sub.on("data", function (note) {
           "use strict";
 
-          console.log("Alarum! %s", note);
-          log.info("Alarum! %s", note);
+          console.log("Alarum! '" + note);
+          _libLoggerJs.logger.info("Alarum! '" + note);
         });
 
         _this._sub.connect("events", function () {

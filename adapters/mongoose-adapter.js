@@ -32,6 +32,8 @@ var _absAdapterJs = require("./absAdapter.js");
 
 var _absAdapterJs2 = _interopRequireDefault(_absAdapterJs);
 
+var _libLoggerJs = require("../lib/logger.js");
+
 var MongooseAdapter = (function (_AbsAdapter) {
   function MongooseAdapter(callback) {
     _classCallCheck(this, MongooseAdapter);
@@ -56,6 +58,7 @@ var MongooseAdapter = (function (_AbsAdapter) {
       this._db = this._mongoose.connection;
       this._db.once("open", function () {
         console.log("mongoose successfull connected");
+        _libLoggerJs.logger.info("mongoose successfull connected");
         callback(_this);
       });
     }

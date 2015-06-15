@@ -36,6 +36,8 @@ var _url = require("url");
 
 var _url2 = _interopRequireDefault(_url);
 
+var _libLoggerJs = require("../lib/logger.js");
+
 var RedisAdapter = (function (_AbsAdapter) {
     function RedisAdapter(callback) {
         _classCallCheck(this, RedisAdapter);
@@ -43,6 +45,7 @@ var RedisAdapter = (function (_AbsAdapter) {
         _get(Object.getPrototypeOf(RedisAdapter.prototype), "constructor", this).call(this, "memory");
         this.init();
         console.log("redis successfull connected");
+        _libLoggerJs.logger.info("redis successfull connected");
         callback(this);
     }
 
@@ -64,6 +67,7 @@ var RedisAdapter = (function (_AbsAdapter) {
                 "use strict";
 
                 console.log("Error " + err);
+                _libLoggerJs.logger.info("Error " + err);
                 log.info("Error " + err);
             });
         }

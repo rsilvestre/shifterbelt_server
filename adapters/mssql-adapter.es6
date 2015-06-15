@@ -5,6 +5,7 @@
 import mssql from "mssql"
 import * as config from "../config/config.js"
 import AbsAdapter from "./absAdapter.js"
+import { logger } from "../lib/logger.js"
 
 export default class MssqlAdapter extends AbsAdapter {
     constructor(callback) {
@@ -19,6 +20,7 @@ export default class MssqlAdapter extends AbsAdapter {
             if (err) throw err;
             this._mssql = mssql;
             console.log('mssql successfull connected');
+            logger.info('mssql successfull connected');
             callback(this);
         });
     }

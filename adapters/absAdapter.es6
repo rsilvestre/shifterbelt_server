@@ -3,9 +3,8 @@
  */
 
 import * as config from "../config/config.js"
-import Logger from "../lib/logger.js"
+import { logger } from "../lib/logger.js"
 
-let log = new Logger();
 
 let adapterContainers = {};
 
@@ -29,7 +28,7 @@ export default class AbsAdapter {
     constructor(name) {
         this._key = config.adapters.getAdapter(name);
         this.addAdapter(this._key, this);
-        log.debug = `the module: ${this._key}, has been added to the adapters list`;
+        logger.debug = `the module: ${this._key}, has been added to the adapters list`;
     }
 
     get key() {

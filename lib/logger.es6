@@ -16,22 +16,23 @@
 import Log from "log"
 import fs from "fs"
 import appRootPath from "app-root-path"
+import logentries from 'node-logentries';
 export var log = null;
 
 export let logger = {
     error: (value) => {
         if (log instanceof Logger) {
-            log.error(value);
+            log.error = value;
         }
     },
     debug: (value) => {
         if (log instanceof Logger) {
-            log.debug(value);
+            log.debug = value;
         }
     },
     info: (value) => {
         if (log instanceof Logger) {
-            log.info(value);
+            log.info = value;
         }
     }
 };
@@ -44,18 +45,22 @@ export default class Logger {
         if (["error", "debug", "info"].indexOf(logLevel) == -1) {
             return new Error(`The log level: ${logLevel}, not exist`);
         }
-        log = new Log(logLevel, fs.createWriteStream(`${appRootPath}/log/${logFile}`));
+        //log = new Log(logLevel, fs.createWriteStream(`${appRootPath}/log/${logFile}`));
+        this._log = logentries.logger({
+            token:'9d7712a2-b05b-45a6-8505-f84424153b79'
+        });
+        log = this;
     }
 
     set error(value) {
-        log.error(value);
+        this._log.error(value);
     }
 
     set debug(value) {
-        log.debug(value);
+        this._log.debug(value);
     }
 
     set info(value) {
-        log.info(value);
+        this._log.info(value);
     }
 }

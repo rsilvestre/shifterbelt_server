@@ -36,6 +36,8 @@ var _absAdapterJs = require("./absAdapter.js");
 
 var _absAdapterJs2 = _interopRequireDefault(_absAdapterJs);
 
+var _libLoggerJs = require("../lib/logger.js");
+
 var AmqpAdapter = (function (_AbsAdapter) {
   function AmqpAdapter(callback) {
     var _this = this;
@@ -70,29 +72,38 @@ var AmqpAdapter = (function (_AbsAdapter) {
 
       process.once("SIGINT", function () {
         console.log("Got SIGINT.  Press Control-D to exit.");
-        console.log("close channel pub");
+        _libLoggerJs.logger.info("Got SIGINT.  Press Control-D to exit.");
+        console.log("close channel pub");;
+        _libLoggerJs.logger.info("close channel pub");
         var ok = _this2._chPub.close();
         ok = ok.then(function (err) {
           if (err) throw err;
           console.log("channel pub closed");
+          _libLoggerJs.logger.info("channel pub closed");
           console.log("close channel sub");
+          _libLoggerJs.logger.info("close channel sub");
           return _this2._chSub.close();
         });
         ok = ok.then(function (err) {
           if (err) throw err;
           console.log("channel sub closed");
+          _libLoggerJs.logger.info("channel sub closed");
           console.log("close connection pub");
+          _libLoggerJs.logger.info("close connection pub");
           return _this2._connPub.close();
         });
         ok = ok.then(function (err) {
           if (err) throw err;
           console.log("connection pub closed");
+          _libLoggerJs.logger.info("connection pub closed");
           console.log("close connection sub");
+          _libLoggerJs.logger.info("close connection sub");
           return _this2._connSub.close();
         });
         ok.then(function (err) {
           if (err) throw err;
           console.log("connection sub closed");
+          _libLoggerJs.logger.info("connection sub closed");
           process.exit(0);
         });
       });
@@ -106,6 +117,7 @@ var AmqpAdapter = (function (_AbsAdapter) {
       _amqplib2["default"].connect(amqpConfig.url).then(function (conn) {
         _this3._connSub = conn;
         console.log("amqb sub connected successfull connected");
+        _libLoggerJs.logger.info("amqb sub connected successfull connected");
         return conn.createChannel().then(function (ch) {
           _this3._chSub = ch;
           return next(callback);
@@ -121,10 +133,11 @@ var AmqpAdapter = (function (_AbsAdapter) {
       _amqplib2["default"].connect(amqpConfig.url).then(function (conn) {
         _this4._connPub = conn;
         console.log("amqb pub connected successfull connected");
+        _libLoggerJs.logger.info("amqb pub connected successfull connected");
         return (0, _when2["default"])(conn.createChannel().then(function (ch) {
           _this4._chPub = ch;
           next();
-        })) /*.ensure(() => { console.log('closed!!!!!!!'); conn.close(); })*/;
+        }));
       }).then(null, console.warn);
     }
   }, {

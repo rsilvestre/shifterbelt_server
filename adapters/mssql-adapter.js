@@ -32,6 +32,8 @@ var _absAdapterJs = require("./absAdapter.js");
 
 var _absAdapterJs2 = _interopRequireDefault(_absAdapterJs);
 
+var _libLoggerJs = require("../lib/logger.js");
+
 var MssqlAdapter = (function (_AbsAdapter) {
     function MssqlAdapter(callback) {
         _classCallCheck(this, MssqlAdapter);
@@ -53,6 +55,7 @@ var MssqlAdapter = (function (_AbsAdapter) {
                 if (err) throw err;
                 _this._mssql = _mssql2["default"];
                 console.log("mssql successfull connected");
+                _libLoggerJs.logger.info("mssql successfull connected");
                 callback(_this);
             });
         }

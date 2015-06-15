@@ -21,6 +21,8 @@ var _controllerIndexJsJs = require("./controller/index.js.js");
 
 var _controllerIndexJsJs2 = _interopRequireDefault(_controllerIndexJsJs);
 
+var _libLoggerJs = require("./lib/logger.js");
+
 var App = (function () {
   function App() {
     _classCallCheck(this, App);
@@ -33,6 +35,7 @@ var App = (function () {
     value: function init() {
 
       var controller = new _controllerIndexJsJs2["default"]();
+      _libLoggerJs.logger.info("Shifterbelt started");
     }
   }, {
     key: "init_bak",
@@ -46,6 +49,7 @@ var App = (function () {
           applications[value["ApplicationId"]] = _libModelManagerJs.modelManager.instanciate("Application", value["ApplicationName"]);
         });
         console.log(applications);
+        _libLoggerJs.logger.info(applications);
         mssqlAdapter.connection.close();
       };
       var mssql = mssqlAdapter.mssql;
@@ -57,6 +61,7 @@ var App = (function () {
         return callback(null, records);
       });
       //console.log(mssqlAdapter.mssql);
+      //logger.info(mssqlAdapter.mssql);
     }
   }]);
 

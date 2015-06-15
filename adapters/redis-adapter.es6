@@ -6,12 +6,14 @@ import redis from "redis"
 import * as config from "../config/config.js"
 import AbsAdapter from "./absAdapter.js"
 import url from "url"
+import { logger } from "../lib/logger.js"
 
 export default class RedisAdapter extends AbsAdapter {
     constructor(callback) {
         super("memory");
         this.init();
         console.log('redis successfull connected');
+        logger.info('redis successfull connected');
         callback(this);
     }
 
@@ -29,6 +31,7 @@ export default class RedisAdapter extends AbsAdapter {
             "use strict";
 
             console.log('Error '+ err);
+            logger.info('Error '+ err);
             log.info('Error '+ err);
         });
     }

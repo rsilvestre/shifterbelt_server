@@ -52,6 +52,8 @@ var _url = require("url");
 
 var _url2 = _interopRequireDefault(_url);
 
+var _libLoggerJs = require("../lib/logger.js");
+
 var WebsocketAdapter = (function (_AbsAdapter) {
   function WebsocketAdapter(callback) {
     _classCallCheck(this, WebsocketAdapter);
@@ -94,12 +96,14 @@ var WebsocketAdapter = (function (_AbsAdapter) {
         nsp.on("connection", function (socket) {
           if (socket.auth) {
             console.log("removing socket from: " + nsp.name);
+            _libLoggerJs.logger.info("removing socket from: " + nsp.name);
             delete nsp.connected[socket.id];
           }
         });
       });
       this._nsp = this._io.of(websocketConfig.namespace);
       console.log("socket.io successfull connected");
+      _libLoggerJs.logger.info("socket.io successfull connected");
       callback(this);
     }
   }, {
