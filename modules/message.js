@@ -418,7 +418,9 @@ var LinkDevice = (function () {
             content: { role: "slave", status: "disconnected", id: this._data["device"]["macAddress"] },
             time: new Date()
           }
-        }), beforeClose);
+        }), function () {
+          setTimeout(beforeClose, 1000);
+        });
       }
 
       return beforeClose();

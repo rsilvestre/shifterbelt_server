@@ -343,7 +343,9 @@ export class LinkDevice {
           content: { role: 'slave', status: 'disconnected', id: this._data['device']['macAddress'] },
           time: new Date()
         }
-      }), beforeClose);
+      }), () => {
+        setTimeout(beforeClose, 1000);
+      });
     }
 
     return beforeClose();
