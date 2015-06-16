@@ -48,8 +48,8 @@ export class LinkDevice {
     if (!devicesContainer.hasOwnProperty(`${data.device.role}s`)) {
       return next(new Error(`The container don't contain a object: ${data.device.role}s`));
     }
-    if (!devicesContainer[`${data.device.role}s`].hasOwnProperty(data['application']['businessId'])) {
-      devicesContainer[`${data.device.role}s`][data['application']['businessId'].toString()] = {};
+    if (!devicesContainer[`${data.device.role}s`].hasOwnProperty(`${data['application']['businessId']}`)) {
+      devicesContainer[`${data.device.role}s`][`${data['application']['businessId']}`] = {};
       return next();
     }
     if (devicesContainer[`${data.device.role}s`][data['application']['businessId']].hasOwnProperty(data['device']['macAddress'])) {
@@ -192,6 +192,9 @@ export class LinkDevice {
 
     keys.forEach((key) => {
       this._queue.registerSubQueue(queue, (message) => {
+        if (!message) {
+          return;
+        }
         console.log('subQueue message: ' + message.content.toString());
         logger.info('subQueue message: ' + message.content.toString());
         let {type: type, message: msg} = JSON.parse(message.content.toString());
@@ -225,6 +228,9 @@ export class LinkDevice {
 
     keys.forEach((key) => {
       this._queue.registerTopicQueue(queue, ["broadcast", deviceId], (message) => {
+        if (!message) {
+          return;
+        }
         console.log('topicQueue message: ' + message.content.toString());
         logger.info('topicQueue message: ' + message.content.toString());
         list[essaim][key].socket.emit('message', message);
@@ -314,8 +320,8 @@ export class LinkDevice {
    */
   disconnectFromSlave(done) {
     let beforeClose = () => {
-      console.log(`queue for slave ${this._data['device']['macAddress']}, has been removed from masters and managers`);
-      logger.info(`queue for slave ${this._data['device']['macAddress']}, has been removed from masters and managers`);
+      console.log(`queue for slave ${this._data['device']['macAddress']}, is going to be removed from masters and managers`);
+      logger.info(`queue for slave ${this._data['device']['macAddress']}, is going to be removed from masters and managers`);
       this._queue.close(`topic`, this._data['device']['macAddress'], () => {
         console.log(`queue for slave: ${this._data['device']['macAddress']}, has been unbinded`);
         logger.info(`queue for slave: ${this._data['device']['macAddress']}, has been unbinded`);

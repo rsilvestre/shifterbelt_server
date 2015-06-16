@@ -29,7 +29,7 @@ export default class AmqpAdapter extends AbsAdapter {
     process.once('SIGINT', () => {
       console.log('Got SIGINT.  Press Control-D to exit.');
       logger.info('Got SIGINT.  Press Control-D to exit.');
-      console.log('close channel pub');;
+      console.log('close channel pub');
       logger.info('close channel pub');
       let ok = this._chPub.close();
       ok = ok.then((err) => {

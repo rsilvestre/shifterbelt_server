@@ -73,8 +73,8 @@ var LinkDevice = (function () {
       if (!devicesContainer.hasOwnProperty("" + data.device.role + "s")) {
         return next(new Error("The container don't contain a object: " + data.device.role + "s"));
       }
-      if (!devicesContainer["" + data.device.role + "s"].hasOwnProperty(data["application"]["businessId"])) {
-        devicesContainer["" + data.device.role + "s"][data["application"]["businessId"].toString()] = {};
+      if (!devicesContainer["" + data.device.role + "s"].hasOwnProperty("" + data["application"]["businessId"])) {
+        devicesContainer["" + data.device.role + "s"]["" + data["application"]["businessId"]] = {};
         return next();
       }
       if (devicesContainer["" + data.device.role + "s"][data["application"]["businessId"]].hasOwnProperty(data["device"]["macAddress"])) {
@@ -240,6 +240,9 @@ var LinkDevice = (function () {
 
       keys.forEach(function (key) {
         _this4._queue.registerSubQueue(queue, function (message) {
+          if (!message) {
+            return;
+          }
           console.log("subQueue message: " + message.content.toString());
           _libLoggerJs.logger.info("subQueue message: " + message.content.toString());
 
@@ -282,6 +285,9 @@ var LinkDevice = (function () {
 
       keys.forEach(function (key) {
         _this5._queue.registerTopicQueue(queue, ["broadcast", deviceId], function (message) {
+          if (!message) {
+            return;
+          }
           console.log("topicQueue message: " + message.content.toString());
           _libLoggerJs.logger.info("topicQueue message: " + message.content.toString());
           list[essaim][key].socket.emit("message", message);
@@ -389,8 +395,8 @@ var LinkDevice = (function () {
       var _this8 = this;
 
       var beforeClose = function beforeClose() {
-        console.log("queue for slave " + _this8._data["device"]["macAddress"] + ", has been removed from masters and managers");
-        _libLoggerJs.logger.info("queue for slave " + _this8._data["device"]["macAddress"] + ", has been removed from masters and managers");
+        console.log("queue for slave " + _this8._data["device"]["macAddress"] + ", is going to be removed from masters and managers");
+        _libLoggerJs.logger.info("queue for slave " + _this8._data["device"]["macAddress"] + ", is going to be removed from masters and managers");
         _this8._queue.close("topic", _this8._data["device"]["macAddress"], function () {
           console.log("queue for slave: " + _this8._data["device"]["macAddress"] + ", has been unbinded");
           _libLoggerJs.logger.info("queue for slave: " + _this8._data["device"]["macAddress"] + ", has been unbinded");

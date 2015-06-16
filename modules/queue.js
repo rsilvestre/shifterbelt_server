@@ -42,11 +42,23 @@ var Queue = (function () {
      * @returns {Promise|Promise.<T>|*}
      */
     value: function close(queue, pattern, next) {
-      if (undefined !== this._qok) {
-        return this._queueAdapter.chSub.unbindQueue(this._qok.queue, "" + this._essaim + "|" + queue, pattern).then(function () {
-          return next();
-        });
+      var _this = this;
+
+      if (this._qok) {
+        var _ret = (function () {
+          var queueId = _this._qok.queue;
+          return {
+            v: _this._queueAdapter.chSub.unbindQueue(queueId, "" + _this._essaim + "|" + queue, pattern).then(function () {
+              return _this._queueAdapter.chSub.deleteQueue(queueId).then(function () {
+                return next();
+              });
+            })
+          };
+        })();
+
+        if (typeof _ret === "object") return _ret.v;
       }
+      return next();
     }
   }, {
     key: "registerSubQueue",
@@ -59,23 +71,23 @@ var Queue = (function () {
      * @returns {{exchange}|{exchange, ticket, type, passive, durable, autoDelete, internal, nowait, arguments}}
      */
     value: function registerSubQueue(queue, subMessage, next) {
-      var _this = this;
+      var _this2 = this;
 
       var ok = this._queueAdapter.chSub.assertExchange("" + this._essaim + "|" + queue, "fanout", { durable: false });
 
       ok = ok.then(function () {
-        return _this._queueAdapter.chSub.assertQueue("", { exclusive: true });
+        return _this2._queueAdapter.chSub.assertQueue("", { exclusive: true });
       });
 
       ok = ok.then(function (qok) {
-        _this._qok = qok;
-        return _this._queueAdapter.chSub.bindQueue(qok.queue, "" + _this._essaim + "|" + queue, "").then(function () {
+        _this2._qok = qok;
+        return _this2._queueAdapter.chSub.bindQueue(qok.queue, "" + _this2._essaim + "|" + queue, "").then(function () {
           return qok.queue;
         });
       });
 
       ok = ok.then(function (q) {
-        return _this._queueAdapter.chSub.consume(q, subMessage, { noAck: true });
+        return _this2._queueAdapter.chSub.consume(q, subMessage, { noAck: true });
       });
 
       ok = ok.then(function () {
@@ -92,21 +104,21 @@ var Queue = (function () {
     key: "registerWorkerQueue",
 
     /**
-    *
-    * @param {String} queue
-    * @param {Function} subMessage
-    * @param {Function} next
-    * @returns {{queue, exclusive, durable, autoDelete, arguments, passive, ticket, nowait}}
-    */
+     *
+     * @param {String} queue
+     * @param {Function} subMessage
+     * @param {Function} next
+     * @returns {{queue, exclusive, durable, autoDelete, arguments, passive, ticket, nowait}}
+     */
     value: function registerWorkerQueue(queue, subMessage, next) {
-      var _this2 = this;
+      var _this3 = this;
 
       var ok = this._queueAdapter.chSub.assertQueue("" + this._essaim + "|" + queue, { durable: true });
       ok = ok.then(function () {
-        _this2._queueAdapter.chSub.prefetch(1);
+        _this3._queueAdapter.chSub.prefetch(1);
       });
       ok = ok.then(function () {
-        return _this2._queueAdapter.chSub.consume("" + _this2._essaim + "|" + queue, subMessage, { noAck: false });
+        return _this3._queueAdapter.chSub.consume("" + _this3._essaim + "|" + queue, subMessage, { noAck: false });
       });
       ok = ok.then(function () {
         console.log(" [*] Waiting for messages. To exit press CTRL+C");
@@ -130,26 +142,26 @@ var Queue = (function () {
      * @returns {{exchange}|{exchange, ticket, type, passive, durable, autoDelete, internal, nowait, arguments}}
      */
     value: function registerTopicQueue(queue, keys, subMessage, next) {
-      var _this3 = this;
+      var _this4 = this;
 
       var ok = this._queueAdapter.chSub.assertExchange("" + this._essaim + "|" + queue, "topic", { durable: false });
 
       ok = ok.then(function () {
-        return _this3._queueAdapter.chSub.assertQueue("", { exclusive: true });
+        return _this4._queueAdapter.chSub.assertQueue("", { exclusive: true });
       });
 
       ok = ok.then(function (qok) {
-        _this3._qok = qok;
+        _this4._qok = qok;
         var q = qok.queue;
         return (0, _when.all)(keys.map(function (rk) {
-          _this3._queueAdapter.chSub.bindQueue(q, "" + _this3._essaim + "|" + queue, rk);
+          _this4._queueAdapter.chSub.bindQueue(q, "" + _this4._essaim + "|" + queue, rk);
         })).then(function () {
           return q;
         });
       });
 
       ok = ok.then(function (q) {
-        return _this3._queueAdapter.chSub.consume(q, subMessage, { noAck: true });
+        return _this4._queueAdapter.chSub.consume(q, subMessage, { noAck: true });
       });
 
       ok = ok.then(function () {
@@ -172,7 +184,7 @@ var Queue = (function () {
      * @returns {{exchange}|{exchange, ticket, type, passive, durable, autoDelete, internal, nowait, arguments}}
      */
     value: function registerPubQueue(queue, next) {
-      var _this4 = this;
+      var _this5 = this;
 
       console.log("queue: " + this._essaim);
       _libLoggerJs.logger.info("queue: " + this._essaim);
@@ -180,7 +192,7 @@ var Queue = (function () {
 
       ok = ok.then(function () {
         next(function (message, callback) {
-          _this4._queueAdapter.chPub.publish("" + _this4._essaim + "|" + queue, "", new Buffer(message));
+          _this5._queueAdapter.chPub.publish("" + _this5._essaim + "|" + queue, "", new Buffer(message));
           console.log(" [x] Sent '" + message + "'");
           _libLoggerJs.logger.info(" [x] Sent '" + message + "'");
           if (callback) {
@@ -201,7 +213,7 @@ var Queue = (function () {
      * @returns {{exchange}|{exchange, ticket, type, passive, durable, autoDelete, internal, nowait, arguments}}
      */
     value: function registerTaskQueue(queue, next) {
-      var _this5 = this;
+      var _this6 = this;
 
       console.log("queue: " + this._essaim);
       _libLoggerJs.logger.info("queue: " + this._essaim);
@@ -209,7 +221,7 @@ var Queue = (function () {
 
       ok = ok.then(function () {
         next(function (message, callback) {
-          _this5._queueAdapter.chPub.sendToQueue("" + _this5._essaim + "|" + queue, new Buffer(message), { deliveryMode: true });
+          _this6._queueAdapter.chPub.sendToQueue("" + _this6._essaim + "|" + queue, new Buffer(message), { deliveryMode: true });
           console.log(" [x] Sent '" + message + "'");
           _libLoggerJs.logger.info(" [x] Sent '" + message + "'");
           if (callback) {
@@ -230,12 +242,12 @@ var Queue = (function () {
      * @returns {{exchange}|{exchange, ticket, type, passive, durable, autoDelete, internal, nowait, arguments}}
      */
     value: function registerSelectorQueue(queue, next) {
-      var _this6 = this;
+      var _this7 = this;
 
       var ok = this._queueAdapter.chPub.assertExchange("" + this._essaim + "|" + queue, "topic", { durable: false });
       ok = ok.then(function () {
         next(function (message, key, callback) {
-          _this6._queueAdapter.chPub.publish("" + _this6._essaim + "|" + queue, key, new Buffer(message));
+          _this7._queueAdapter.chPub.publish("" + _this7._essaim + "|" + queue, key, new Buffer(message));
           console.log(" [x] Sent " + key + ": '" + message + "'");
           _libLoggerJs.logger.info(" [x] Sent " + key + ": '" + message + "'");
           if (callback) {

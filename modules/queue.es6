@@ -25,11 +25,15 @@ export default class Queue {
    * @returns {Promise|Promise.<T>|*}
    */
   close(queue, pattern, next) {
-      if (undefined !== this._qok) {
-        return this._queueAdapter.chSub.unbindQueue(this._qok.queue, `${this._essaim}|${queue}`, pattern).then(() => {
+    if (this._qok) {
+      let queueId = this._qok.queue;
+      return this._queueAdapter.chSub.unbindQueue(queueId, `${this._essaim}|${queue}`, pattern).then(() => {
+        return this._queueAdapter.chSub.deleteQueue(queueId).then(() => {
           return next();
         });
-      }
+      });
+    }
+    return next();
   }
 
   /**
@@ -68,7 +72,7 @@ export default class Queue {
     return ok;
   }
 
-   /**
+  /**
    *
    * @param {String} queue
    * @param {Function} subMessage

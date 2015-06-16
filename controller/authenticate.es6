@@ -9,8 +9,34 @@ import { logger } from "../lib/logger.js"
 
 import _ from "underscore"
 
+class ArrayStuff extends Array {
+  constructor() {
+    super();
+  }
+
+  // check if an element exists in array using a comparer function
+  // comparer : function(currentElement)
+  inArray(comparer) {
+    return !!this.filter(function(value) {
+      comparer(value);
+    }).length;
+  }
+
+  // adds an element to the array if it does not already exist using a comparer
+  // function
+  pushIfNotExist(element, comparer) {
+    if (!this.inArray(comparer)) {
+      this.push(element);
+      return true;
+    }
+    return false;
+  }
+}
+
 export let authenticateInit = () => {
+  let socketList = new ArrayStuff();
   let websocketAdapter = adapters.getAdapter("websocket");
+
   websocketAdapter.connection(function(socket) {
     let device = null;
     console.log("a device is connected");
@@ -38,6 +64,11 @@ export let authenticateInit = () => {
           nsp.connected[socket.id] = socket;
         });
 
+        if (!socketList.pushIfNotExist(socket.id, (value) => {
+            return value === socket.id;
+          })) {
+          return socket.close();
+        }
 
         let linkDevice = new LinkDevice(device, socket, (err, device, slaves) => {
           if (err) {

@@ -73,7 +73,7 @@ var AmqpAdapter = (function (_AbsAdapter) {
       process.once("SIGINT", function () {
         console.log("Got SIGINT.  Press Control-D to exit.");
         _libLoggerJs.logger.info("Got SIGINT.  Press Control-D to exit.");
-        console.log("close channel pub");;
+        console.log("close channel pub");
         _libLoggerJs.logger.info("close channel pub");
         var ok = _this2._chPub.close();
         ok = ok.then(function (err) {

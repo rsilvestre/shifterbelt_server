@@ -238,8 +238,8 @@ ApplicationSchema.statics = {
 
   /**
    *
-   * @param businessId
-   * @param cb
+   * @param {Object} data
+   * @param {Function} cb
    * @api public
    */
   authenticate: function authenticate(data, cb) {
