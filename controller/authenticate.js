@@ -150,7 +150,7 @@ var authenticateInit = function authenticateInit() {
         _libLoggerJs.logger.info("Disconnection socket: " + socket.id);
         socket.disconnect("unauthorized");
       }
-    }, 1000);
+    }, 5000);
 
     socket.on("disconnect", function () {
       console.log("a device: " + socket.id + ", is disconnected");

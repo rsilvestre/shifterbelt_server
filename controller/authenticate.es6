@@ -115,7 +115,7 @@ export let authenticateInit = () => {
         logger.info(`Disconnection socket: ${socket.id}`);
         socket.disconnect('unauthorized');
       }
-    }, 1000);
+    }, 5000);
 
     socket.on('disconnect', () => {
       console.log(`a device: ${socket.id}, is disconnected`);
