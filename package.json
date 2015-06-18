@@ -6,7 +6,7 @@
   "dependencies": {
     "amqplib": "^0.3.2",
     "app-root-path": "^1.0.0",
-    "async": "^0.9.2",
+    "async": "^1.2.1",
     "chai": "^2.2.0",
     "chalk": "^1.0.0",
     "crypto": "0.0.3",

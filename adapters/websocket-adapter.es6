@@ -35,14 +35,14 @@ export default class WebsocketAdapter extends AbsAdapter {
       sub.auth(redisURL.auth.split(":")[1]);
     }
 
-    let server = http.createServer((req, res) => {
+    this._server = http.createServer((req, res) => {
       res.end('thank you');
     });
 
-    this._io = socketIo.listen(server);
+    this._io = socketIo.listen(this._server);
     this._io.adapter(socketRedis({ pubClient: pub, subClient: sub }));
 
-    server.listen(websocketConfig.port);
+    this._server.listen(websocketConfig.port);
 
     _.each(this._io.nsps, (nsp) => {
       nsp.on('connection', (socket) => {
@@ -59,15 +59,33 @@ export default class WebsocketAdapter extends AbsAdapter {
     callback(this);
   }
 
+  /**
+   *
+   * @returns {socket.io}
+   */
   get io() {
     return this._io;
   }
 
+  /**
+   *
+   * @returns {Array|*|String}
+   */
   get nsp() {
     return this._nsp;
   }
 
   connection(callback) {
     this._nsp.on("connection", callback);
+  }
+
+  close(next) {
+    console.log('close websocket');
+    logger.info('close websocket');
+    this._io.close();
+    console.log('close server');
+    logger.info('close server');
+    this._server.close();
+    next();
   }
 }

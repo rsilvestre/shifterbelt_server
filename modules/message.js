@@ -26,11 +26,106 @@ var _underscore2 = _interopRequireDefault(_underscore);
 
 var _libLoggerJs = require("../lib/logger.js");
 
+var _async = require("async");
+
+var _async2 = _interopRequireDefault(_async);
+
+/**
+ * Container a dictionnary with all the talkers
+ *
+ * @type {{masters: {}, managers: {}, slaves: {}}}
+ */
 var devicesContainer = {
   masters: {},
   managers: {},
   slaves: {}
 };
+
+/**
+ * Process to disconnect the talker when the server stop
+ *
+ * @param next
+ */
+var close1 = function close1(next) {
+  console.log("close message");
+
+  Object.keys(devicesContainer).forEach(function (deviceListKey) {
+    console.log("disconnect device container: " + deviceListKey);
+    _libLoggerJs.logger.info("disconnect device container: " + deviceListKey);
+
+    Object.keys(devicesContainer[deviceListKey]).forEach(function (essaimKey) {
+      console.log("disconnect device essaim: " + essaimKey);
+      _libLoggerJs.logger.info("disconnect device essaim: " + essaimKey);
+
+      Object.keys(devicesContainer[deviceListKey][essaimKey]).forEach(function (deviceKey) {
+        console.log("disconnect device: " + deviceKey);
+        _libLoggerJs.logger.info("disconnect device: " + deviceKey);
+
+        var device = devicesContainer[deviceListKey][essaimKey][deviceKey];
+        device.socket.emit("disconnect");
+        device.socket.disconnect();
+      });
+    });
+  });
+
+  next();
+};
+
+exports.close1 = close1;
+/**
+ * Process to disconnect the talker when the server stop
+ *
+ * @param next
+ */
+var close = function close(next) {
+  console.log("close message");
+
+  _async2["default"].forEachOfSeries(devicesContainer, function (essaimList, deviceListKey, cbDeviceList) {
+    console.log("disconnect device container: " + deviceListKey);
+    _libLoggerJs.logger.info("disconnect device container: " + deviceListKey);
+
+    _async2["default"].forEachOf(essaimList, function (essaim, essaimKey, cbEssaim) {
+      console.log("disconnect device essaim: " + essaimKey);
+      _libLoggerJs.logger.info("disconnect device essaim: " + essaimKey);
+
+      _async2["default"].forEachOf(essaim, function (device, deviceKey, cbDevice) {
+        console.log("disconnect device: " + deviceKey);
+        _libLoggerJs.logger.info("disconnect device: " + deviceKey);
+
+        device.socket.emit("disconnect");
+        device.socket.disconnect();
+
+        cbDevice();
+      }, function (err) {
+        if (err) {
+          console.warn(err);
+          _libLoggerJs.logger.warn(err);
+        }
+      });
+
+      cbEssaim();
+    }, function (err) {
+      if (err) {
+        console.warn(err);
+        _libLoggerJs.logger.warn(err);
+      }
+    });
+
+    cbDeviceList();
+  }, function (err) {
+    if (err) {
+      console.warn(err);
+      _libLoggerJs.logger.warn(err);
+    }
+
+    next();
+  });
+};
+
+exports.close = close;
+/**
+ *
+ */
 
 var LinkDevice = (function () {
   /**
@@ -47,17 +142,41 @@ var LinkDevice = (function () {
     this._socket = socket;
     this._data = data;
     this._send = null;
-    var action = "register" + data["device"]["role"].charAt(0).toUpperCase() + "" + data["device"]["role"].slice(1);
-    console.log("action: " + action);
-    _libLoggerJs.logger.info("action: " + action);
 
     //if (!this.hasOwnProperty(action)) {
     //  throw new Error(`The property: ${action}, not exist`);
     //}
+
+    var Starter = (function () {
+      function Starter() {
+        _classCallCheck(this, Starter);
+      }
+
+      _createClass(Starter, null, [{
+        key: "master",
+        value: function master(context, callback) {
+          context.registerMaster(callback);
+        }
+      }, {
+        key: "manager",
+        value: function manager(context, callback) {
+          context.registerManager(callback);
+        }
+      }, {
+        key: "slave",
+        value: function slave(context, callback) {
+          context.registerSlave(callback);
+        }
+      }]);
+
+      return Starter;
+    })();
+
     try {
-      this[action](data, socket, callback);
+      Starter[data.device.role](this, callback);
     } catch (e) {
-      console.warn(new Error("The property: " + action + ", not exist: " + e));
+      console.warn(new Error("The property: " + data.device.role + ", not exist: " + e));
+      _libLoggerJs.logger.warn(new Error("The property: " + data.device.role + ", not exist: " + e));
     }
   }
 
@@ -66,19 +185,18 @@ var LinkDevice = (function () {
 
     /**
      *
-     * @param {Object} data
      * @param {Function} next
      */
-    value: function createIfNotExistListDevices(data, next) {
-      if (!devicesContainer.hasOwnProperty("" + data.device.role + "s")) {
-        return next(new Error("The container don't contain a object: " + data.device.role + "s"));
+    value: function createIfNotExistListDevices(next) {
+      if (!devicesContainer.hasOwnProperty("" + this._data.device.role + "s")) {
+        return next(new Error("The container don't contain a object: " + this._data.device.role + "s"));
       }
-      if (!devicesContainer["" + data.device.role + "s"].hasOwnProperty("" + data["application"]["businessId"])) {
-        devicesContainer["" + data.device.role + "s"]["" + data["application"]["businessId"]] = {};
+      if (!devicesContainer["" + this._data.device.role + "s"].hasOwnProperty("" + this._data["application"]["businessId"])) {
+        devicesContainer["" + this._data.device.role + "s"]["" + this._data["application"]["businessId"]] = {};
         return next();
       }
-      if (devicesContainer["" + data.device.role + "s"][data["application"]["businessId"]].hasOwnProperty(data["device"]["macAddress"])) {
-        return next(new Error("The queue: " + data["device"]["role"] + ", still contain a key: " + data["device"]["macAddress"]));
+      if (devicesContainer["" + this._data.device.role + "s"][this._data["application"]["businessId"]].hasOwnProperty(this._data["device"]["macAddress"])) {
+        return next(new Error("The queue: " + this._data["device"]["role"] + ", still contain a key: " + this._data["device"]["macAddress"]));
       }
       next();
     }
@@ -102,26 +220,24 @@ var LinkDevice = (function () {
 
     /**
      *
-     * @param {Object} data
-     * @param {socket.io} socket
      * @param {Function} next
      */
-    value: function registerMaster(data, socket, next) {
+    value: function registerMaster(next) {
       var _this = this;
 
-      this.createIfNotExistListDevices(data, function (err) {
+      this.createIfNotExistListDevices(function (err) {
         if (err) {
           return next(err);
         }
 
-        devicesContainer.masters["" + data["application"]["businessId"]]["" + data["device"]["macAddress"]] = _this;
+        devicesContainer.masters["" + _this._data["application"]["businessId"]]["" + _this._data["device"]["macAddress"]] = _this;
 
-        _this.createSubQueue("pubsub", data["application"]["businessId"], _this.createFakeList(data), function () {
-          console.log("" + data["device"]["macAddress"] + " has been added to the SubPub queue of the essaim " + data["application"]["businessId"]);
-          _libLoggerJs.logger.info("" + data["device"]["macAddress"] + " has been added to the SubPub queue of the essaim " + data["application"]["businessId"]);
+        _this.createSubQueue("pubsub", _this._data["application"]["businessId"], _this.createFakeList(_this._data), function () {
+          console.log("" + _this._data["device"]["macAddress"] + " has been added to the SubPub queue of the essaim " + _this._data["application"]["businessId"]);
+          _libLoggerJs.logger.info("" + _this._data["device"]["macAddress"] + " has been added to the SubPub queue of the essaim " + _this._data["application"]["businessId"]);
           _this._queue.registerSelectorQueue("topic", function (callback) {
             _this._send = callback;
-            socket.on("message", function (chunk) {
+            _this._socket.on("message", function (chunk) {
               var _JSON$parse = JSON.parse(chunk);
 
               var key = _JSON$parse.key;
@@ -132,7 +248,7 @@ var LinkDevice = (function () {
               }
               return callback(chunk);
             });
-            next(null, data["device"], devicesContainer.slaves["" + data["application"]["businessId"]] || {});
+            next(null, _this._data["device"], devicesContainer.slaves["" + _this._data["application"]["businessId"]] || {});
           });
         });
       });
@@ -142,26 +258,24 @@ var LinkDevice = (function () {
 
     /**
      *
-     * @param {Object} data
-     * @param {socket.io} socket
      * @param {Function} next
      */
-    value: function registerManager(data, socket, next) {
+    value: function registerManager(next) {
       var _this2 = this;
 
-      this.createIfNotExistListDevices(data, function (err) {
+      this.createIfNotExistListDevices(function (err) {
         if (err) {
           return next(err);
         }
 
-        devicesContainer.managers["" + data["application"]["businessId"]]["" + data["device"]["macAddress"]] = _this2;
+        devicesContainer.managers["" + _this2._data["application"]["businessId"]]["" + _this2._data["device"]["macAddress"]] = _this2;
 
-        _this2.createSubQueue("pubsub", data["application"]["businessId"], _this2.createFakeList(data), function () {
-          console.log("" + data["device"]["macAddress"] + " has been added to the SubPub queue of the essaim " + data["application"]["businessId"]);
-          _libLoggerJs.logger.info("" + data["device"]["macAddress"] + " has been added to the SubPub queue of the essaim " + data["application"]["businessId"]);
+        _this2.createSubQueue("pubsub", _this2._data["application"]["businessId"], _this2.createFakeList(_this2._data), function () {
+          console.log("" + _this2._data["device"]["macAddress"] + " has been added to the SubPub queue of the essaim " + _this2._data["application"]["businessId"]);
+          _libLoggerJs.logger.info("" + _this2._data["device"]["macAddress"] + " has been added to the SubPub queue of the essaim " + _this2._data["application"]["businessId"]);
           _this2._queue.registerSelectorQueue("topic", function (callback) {
             _this2._send = callback;
-            socket.on("message", function (chunk) {
+            _this2._socket.on("message", function (chunk) {
               var _JSON$parse2 = JSON.parse(chunk);
 
               var key = _JSON$parse2.key;
@@ -172,7 +286,7 @@ var LinkDevice = (function () {
               }
               return callback(chunk);
             });
-            next(null, data["device"], devicesContainer.slaves["" + data["application"]["businessId"]] || {});
+            next(null, _this2._data["device"], devicesContainer.slaves["" + _this2._data["application"]["businessId"]] || {});
           });
         });
       });
@@ -182,38 +296,36 @@ var LinkDevice = (function () {
 
     /**
      *
-     * @param {Object} data
-     * @param {socket.io} socket
      * @param {Function} next
      */
-    value: function registerSlave(data, socket, next) {
+    value: function registerSlave(next) {
       var _this3 = this;
 
-      this.createIfNotExistListDevices(data, function (err) {
+      this.createIfNotExistListDevices(function (err) {
         if (err) {
           return next(err);
         }
 
-        devicesContainer.slaves["" + data["application"]["businessId"]]["" + data["device"]["macAddress"]] = _this3;
+        devicesContainer.slaves["" + _this3._data["application"]["businessId"]]["" + _this3._data["device"]["macAddress"]] = _this3;
 
-        _this3.createTopicQueue("topic", data["application"]["businessId"], data["device"]["macAddress"], _this3.createFakeList(data), function () {
-          console.log("" + data["device"]["macAddress"] + " has been added to the Topic queue of the essaim " + data["application"]["businessId"]);
-          _libLoggerJs.logger.info("" + data["device"]["macAddress"] + " has been added to the Topic queue of the essaim " + data["application"]["businessId"]);
+        _this3.createTopicQueue("topic", _this3._data["application"]["businessId"], _this3._data["device"]["macAddress"], _this3.createFakeList(_this3._data), function () {
+          console.log("" + _this3._data["device"]["macAddress"] + " has been added to the Topic queue of the essaim " + _this3._data["application"]["businessId"]);
+          _libLoggerJs.logger.info("" + _this3._data["device"]["macAddress"] + " has been added to the Topic queue of the essaim " + _this3._data["application"]["businessId"]);
           _this3._queue.registerPubQueue("pubsub", function (callback) {
             _this3._send = callback;
             callback(JSON.stringify({
               type: "service", message: {
                 action: "connection",
-                content: { role: "slave", status: "connected", id: data["device"]["macAddress"] },
+                content: { role: "slave", status: "connected", id: _this3._data["device"]["macAddress"] },
                 time: new Date()
               }
             }));
-            socket.on("message", function (message) {
+            _this3._socket.on("message", function (message) {
               var messageObj = JSON.parse(message);
-              messageObj.slaveId = data["device"]["macAddress"];
+              messageObj.slaveId = _this3._data["device"]["macAddress"];
               callback(JSON.stringify(messageObj));
             });
-            next(null, data["device"]);
+            next(null, _this3._data["device"]);
           });
         });
       });
@@ -302,8 +414,8 @@ var LinkDevice = (function () {
     key: "socket",
 
     /**
-     *
-     * @returns {*|LinkDevice.socket}
+     * Return socket
+     * @returns {socket.io}
      */
     get: function () {
       return this._socket;
@@ -327,6 +439,7 @@ var LinkDevice = (function () {
         this[action](done);
       } catch (e) {
         console.warn(new Error("The property: " + action + ", not exist: " + e));
+        _libLoggerJs.logger.warn(new Error("The property: " + action + ", not exist: " + e));
       }
     }
   }, {
@@ -440,5 +553,10 @@ var LinkDevice = (function () {
 })();
 
 exports.LinkDevice = LinkDevice;
+
+/**
+ *
+ * @returns {*|LinkDevice.socket}
+ */
 
 //# sourceMappingURL=message.js.map

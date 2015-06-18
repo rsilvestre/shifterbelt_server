@@ -6,13 +6,103 @@ import { adapters } from "../adapters/absAdapter.js";
 import Queue from '../modules/queue.js'
 import _ from "underscore";
 import { logger } from "../lib/logger.js"
+import async from 'async'
 
+/**
+ * Container a dictionnary with all the talkers
+ *
+ * @type {{masters: {}, managers: {}, slaves: {}}}
+ */
 let devicesContainer = {
   masters: {},
   managers: {},
   slaves: {}
 };
 
+/**
+ * Process to disconnect the talker when the server stop
+ *
+ * @param next
+ */
+export let close1 = (next) => {
+  console.log('close message');
+
+  Object.keys(devicesContainer).forEach((deviceListKey) => {
+    console.log(`disconnect device container: ${deviceListKey}`);
+    logger.info(`disconnect device container: ${deviceListKey}`);
+
+    Object.keys(devicesContainer[deviceListKey]).forEach((essaimKey) => {
+      console.log(`disconnect device essaim: ${essaimKey}`);
+      logger.info(`disconnect device essaim: ${essaimKey}`);
+
+      Object.keys(devicesContainer[deviceListKey][essaimKey]).forEach((deviceKey) => {
+        console.log(`disconnect device: ${deviceKey}`);
+        logger.info(`disconnect device: ${deviceKey}`);
+
+        let device = devicesContainer[deviceListKey][essaimKey][deviceKey];
+        device.socket.emit('disconnect');
+        device.socket.disconnect();
+      });
+    });
+  });
+
+  next();
+};
+
+/**
+ * Process to disconnect the talker when the server stop
+ *
+ * @param next
+ */
+export let close = (next) => {
+  console.log('close message');
+
+  async.forEachOfSeries(devicesContainer, (essaimList, deviceListKey, cbDeviceList) => {
+    console.log(`disconnect device container: ${deviceListKey}`);
+    logger.info(`disconnect device container: ${deviceListKey}`);
+
+    async.forEachOf(essaimList, (essaim, essaimKey, cbEssaim) => {
+      console.log(`disconnect device essaim: ${essaimKey}`);
+      logger.info(`disconnect device essaim: ${essaimKey}`);
+
+      async.forEachOf(essaim, (device, deviceKey, cbDevice) => {
+        console.log(`disconnect device: ${deviceKey}`);
+        logger.info(`disconnect device: ${deviceKey}`);
+
+        device.socket.emit('disconnect');
+        device.socket.disconnect();
+
+        cbDevice();
+      }, (err) => {
+        if (err) {
+          console.warn(err);
+          logger.warn(err);
+        }
+      });
+
+      cbEssaim();
+    }, (err) => {
+      if (err) {
+        console.warn(err);
+        logger.warn(err);
+      }
+    });
+
+    cbDeviceList();
+  }, (err) => {
+    if (err) {
+      console.warn(err);
+      logger.warn(err);
+    }
+
+    next();
+  });
+
+};
+
+/**
+ *
+ */
 export class LinkDevice {
   /**
    *
@@ -25,35 +115,47 @@ export class LinkDevice {
     this._socket = socket;
     this._data = data;
     this._send = null;
-    let action = `register${data['device']['role'].charAt(0).toUpperCase()}${data['device']['role'].slice(1)}`;
-    console.log(`action: ${action}`);
-    logger.info(`action: ${action}`);
 
     //if (!this.hasOwnProperty(action)) {
     //  throw new Error(`The property: ${action}, not exist`);
     //}
+    class Starter {
+      constructor() {
+
+      }
+      static master(context, callback) {
+        context.registerMaster(callback);
+      }
+      static manager(context, callback) {
+        context.registerManager(callback);
+      }
+      static slave(context, callback) {
+        context.registerSlave(callback);
+      }
+    }
+
     try {
-      this[action](data, socket, callback);
+      Starter[data.device.role](this, callback);
     } catch (e) {
-      console.warn(new Error(`The property: ${action}, not exist: ${e}`));
+      console.warn(new Error(`The property: ${data.device.role}, not exist: ${e}`));
+      logger.warn(new Error(`The property: ${data.device.role}, not exist: ${e}`));
     }
   }
 
   /**
    *
-   * @param {Object} data
    * @param {Function} next
    */
-  createIfNotExistListDevices(data, next) {
-    if (!devicesContainer.hasOwnProperty(`${data.device.role}s`)) {
-      return next(new Error(`The container don't contain a object: ${data.device.role}s`));
+  createIfNotExistListDevices(next) {
+    if (!devicesContainer.hasOwnProperty(`${this._data.device.role}s`)) {
+      return next(new Error(`The container don't contain a object: ${this._data.device.role}s`));
     }
-    if (!devicesContainer[`${data.device.role}s`].hasOwnProperty(`${data['application']['businessId']}`)) {
-      devicesContainer[`${data.device.role}s`][`${data['application']['businessId']}`] = {};
+    if (!devicesContainer[`${this._data.device.role}s`].hasOwnProperty(`${this._data['application']['businessId']}`)) {
+      devicesContainer[`${this._data.device.role}s`][`${this._data['application']['businessId']}`] = {};
       return next();
     }
-    if (devicesContainer[`${data.device.role}s`][data['application']['businessId']].hasOwnProperty(data['device']['macAddress'])) {
-      return next(new Error(`The queue: ${data['device']['role']}, still contain a key: ${data['device']['macAddress']}`));
+    if (devicesContainer[`${this._data.device.role}s`][this._data['application']['businessId']].hasOwnProperty(this._data['device']['macAddress'])) {
+      return next(new Error(`The queue: ${this._data['device']['role']}, still contain a key: ${this._data['device']['macAddress']}`));
     }
     next();
   }
@@ -73,31 +175,29 @@ export class LinkDevice {
 
   /**
    *
-   * @param {Object} data
-   * @param {socket.io} socket
    * @param {Function} next
    */
-  registerMaster(data, socket, next) {
-    this.createIfNotExistListDevices(data, (err) => {
+  registerMaster(next) {
+    this.createIfNotExistListDevices((err) => {
       if (err) {
         return next(err);
       }
 
-      devicesContainer.masters[`${data['application']['businessId']}`][`${data['device']['macAddress']}`] = this;
+      devicesContainer.masters[`${this._data['application']['businessId']}`][`${this._data['device']['macAddress']}`] = this;
 
-      this.createSubQueue(`pubsub`, data['application']['businessId'], this.createFakeList(data), () => {
-        console.log(`${data['device']['macAddress']} has been added to the SubPub queue of the essaim ${data['application']['businessId']}`);
-        logger.info(`${data['device']['macAddress']} has been added to the SubPub queue of the essaim ${data['application']['businessId']}`);
+      this.createSubQueue(`pubsub`, this._data['application']['businessId'], this.createFakeList(this._data), () => {
+        console.log(`${this._data['device']['macAddress']} has been added to the SubPub queue of the essaim ${this._data['application']['businessId']}`);
+        logger.info(`${this._data['device']['macAddress']} has been added to the SubPub queue of the essaim ${this._data['application']['businessId']}`);
         this._queue.registerSelectorQueue(`topic`, (callback) => {
           this._send = callback;
-          socket.on('message', (chunk) => {
+          this._socket.on('message', (chunk) => {
             let { key, message } = JSON.parse(chunk);
             if (message) {
               return callback(message, key);
             }
             return callback(chunk);
           });
-          next(null, data['device'], devicesContainer.slaves[`${data['application']['businessId']}`] || {});
+          next(null, this._data['device'], devicesContainer.slaves[`${this._data['application']['businessId']}`] || {});
         });
       });
 
@@ -107,31 +207,29 @@ export class LinkDevice {
 
   /**
    *
-   * @param {Object} data
-   * @param {socket.io} socket
    * @param {Function} next
    */
-  registerManager(data, socket, next) {
-    this.createIfNotExistListDevices(data, (err) => {
+  registerManager(next) {
+    this.createIfNotExistListDevices((err) => {
       if (err) {
         return next(err);
       }
 
-      devicesContainer.managers[`${data['application']['businessId']}`][`${data['device']['macAddress']}`] = this;
+      devicesContainer.managers[`${this._data['application']['businessId']}`][`${this._data['device']['macAddress']}`] = this;
 
-      this.createSubQueue(`pubsub`, data['application']['businessId'], this.createFakeList(data), () => {
-        console.log(`${data['device']['macAddress']} has been added to the SubPub queue of the essaim ${data['application']['businessId']}`);
-        logger.info(`${data['device']['macAddress']} has been added to the SubPub queue of the essaim ${data['application']['businessId']}`);
+      this.createSubQueue(`pubsub`, this._data['application']['businessId'], this.createFakeList(this._data), () => {
+        console.log(`${this._data['device']['macAddress']} has been added to the SubPub queue of the essaim ${this._data['application']['businessId']}`);
+        logger.info(`${this._data['device']['macAddress']} has been added to the SubPub queue of the essaim ${this._data['application']['businessId']}`);
         this._queue.registerSelectorQueue(`topic`, (callback) => {
           this._send = callback;
-          socket.on('message', (chunk) => {
+          this._socket.on('message', (chunk) => {
             let { key, message } = JSON.parse(chunk);
             if (message) {
               return callback(message, key);
             }
             return callback(chunk);
           });
-          next(null, data['device'], devicesContainer.slaves[`${data['application']['businessId']}`] || {});
+          next(null, this._data['device'], devicesContainer.slaves[`${this._data['application']['businessId']}`] || {});
         });
       });
     });
@@ -139,36 +237,34 @@ export class LinkDevice {
 
   /**
    *
-   * @param {Object} data
-   * @param {socket.io} socket
    * @param {Function} next
    */
-  registerSlave(data, socket, next) {
-    this.createIfNotExistListDevices(data, (err) => {
+  registerSlave(next) {
+    this.createIfNotExistListDevices((err) => {
       if (err) {
         return next(err);
       }
 
-      devicesContainer.slaves[`${data['application']['businessId']}`][`${data['device']['macAddress']}`] = this;
+      devicesContainer.slaves[`${this._data['application']['businessId']}`][`${this._data['device']['macAddress']}`] = this;
 
-      this.createTopicQueue(`topic`, data['application']['businessId'], data['device']['macAddress'], this.createFakeList(data), () => {
-        console.log(`${data['device']['macAddress']} has been added to the Topic queue of the essaim ${data['application']['businessId']}`);
-        logger.info(`${data['device']['macAddress']} has been added to the Topic queue of the essaim ${data['application']['businessId']}`);
+      this.createTopicQueue(`topic`, this._data['application']['businessId'], this._data['device']['macAddress'], this.createFakeList(this._data), () => {
+        console.log(`${this._data['device']['macAddress']} has been added to the Topic queue of the essaim ${this._data['application']['businessId']}`);
+        logger.info(`${this._data['device']['macAddress']} has been added to the Topic queue of the essaim ${this._data['application']['businessId']}`);
         this._queue.registerPubQueue(`pubsub`, (callback) => {
           this._send = callback;
           callback(JSON.stringify({
             type: 'service', message: {
               action: 'connection',
-              content: { role: 'slave', status: 'connected', id: data['device']['macAddress'] },
+              content: { role: 'slave', status: 'connected', id: this._data['device']['macAddress'] },
               time: new Date()
             }
           }));
-          socket.on('message', (message) => {
+          this._socket.on('message', (message) => {
             let messageObj = JSON.parse(message);
-            messageObj.slaveId = data['device']['macAddress'];
+            messageObj.slaveId = this._data['device']['macAddress'];
             callback(JSON.stringify(messageObj));
           });
-          next(null, data['device']);
+          next(null, this._data['device']);
         });
       });
 
@@ -266,6 +362,7 @@ export class LinkDevice {
       this[action](done);
     } catch (e) {
       console.warn(new Error(`The property: ${action}, not exist: ${e}`));
+      logger.warn(new Error(`The property: ${action}, not exist: ${e}`));
     }
   }
 
@@ -358,6 +455,14 @@ export class LinkDevice {
     //function stopFunction() {
     //  clearInterval(interval);
     //}
+  }
+
+  /**
+   * Return socket
+   * @returns {socket.io}
+   */
+  get socket() {
+    return this._socket;
   }
 
 }

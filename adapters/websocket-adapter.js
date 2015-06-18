@@ -83,14 +83,14 @@ var WebsocketAdapter = (function (_AbsAdapter) {
         sub.auth(redisURL.auth.split(":")[1]);
       }
 
-      var server = _http2["default"].createServer(function (req, res) {
+      this._server = _http2["default"].createServer(function (req, res) {
         res.end("thank you");
       });
 
-      this._io = _socketIo2["default"].listen(server);
+      this._io = _socketIo2["default"].listen(this._server);
       this._io.adapter((0, _socketIoRedis2["default"])({ pubClient: pub, subClient: sub }));
 
-      server.listen(websocketConfig.port);
+      this._server.listen(websocketConfig.port);
 
       _underscore2["default"].each(this._io.nsps, function (nsp) {
         nsp.on("connection", function (socket) {
@@ -108,11 +108,21 @@ var WebsocketAdapter = (function (_AbsAdapter) {
     }
   }, {
     key: "io",
+
+    /**
+     *
+     * @returns {socket.io}
+     */
     get: function () {
       return this._io;
     }
   }, {
     key: "nsp",
+
+    /**
+     *
+     * @returns {Array|*|String}
+     */
     get: function () {
       return this._nsp;
     }
@@ -120,6 +130,17 @@ var WebsocketAdapter = (function (_AbsAdapter) {
     key: "connection",
     value: function connection(callback) {
       this._nsp.on("connection", callback);
+    }
+  }, {
+    key: "close",
+    value: function close(next) {
+      console.log("close websocket");
+      _libLoggerJs.logger.info("close websocket");
+      this._io.close();
+      console.log("close server");
+      _libLoggerJs.logger.info("close server");
+      this._server.close();
+      next();
     }
   }]);
 

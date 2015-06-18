@@ -16,6 +16,18 @@ export default class App {
     let controller = new Controller();
     logger.info("Shifterbelt started");
 
+    process.on('SIGINT', () => {
+      logger.info("Shifterbelt is in the closing process");
+      controller.close(()=> {
+        setTimeout(() => {
+          adapters.getAdapter("queue").close(() => {
+            adapters.getAdapter('websocket').close(() => {
+              process.exit(0);
+            });
+          });
+        }, 5000);
+      });
+    });
   }
 
   init_bak() {

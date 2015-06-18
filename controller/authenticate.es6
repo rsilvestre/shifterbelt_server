@@ -3,11 +3,13 @@
  */
 
 import { adapters } from "../adapters/absAdapter.js"
-import { LinkDevice } from "../modules/message.js"
+import { LinkDevice, close } from "../modules/message.js"
 import Authentication from "../modules/authentication.js"
 import { logger } from "../lib/logger.js"
 
 import _ from "underscore"
+
+exports.messageClose = close;
 
 class ArrayStuff extends Array {
   constructor() {
@@ -64,15 +66,19 @@ export let authenticateInit = () => {
           nsp.connected[socket.id] = socket;
         });
 
-        if (!socketList.pushIfNotExist(socket.id, (value) => {
-            return value === socket.id;
+        if (!socketList.pushIfNotExist({ id: socket.id, socket: socket }, (value) => {
+            return value.id === socket.id;
           })) {
           return socket.close();
         }
 
+
+
         let linkDevice = new LinkDevice(device, socket, (err, device, slaves) => {
           if (err) {
-            return console.warn(err);
+            console.warn(err);
+            logger.warn(err);
+            return;
           }
           socket.emit('authenticated');
           socket.emit('service', {

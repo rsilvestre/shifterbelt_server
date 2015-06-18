@@ -25,45 +25,43 @@ export default class AmqpAdapter extends AbsAdapter {
     this.createSubChannel(callback, (...arg) => {
       this.createPubChannel(...arg);
     });
+  }
 
-    process.once('SIGINT', () => {
-      console.log('Got SIGINT.  Press Control-D to exit.');
-      logger.info('Got SIGINT.  Press Control-D to exit.');
-      console.log('close channel pub');
-      logger.info('close channel pub');
-      let ok = this._chPub.close();
-      ok = ok.then((err) => {
-        if (err) throw err;
-        console.log('channel pub closed');
-        logger.info('channel pub closed');
-        console.log('close channel sub');
-        logger.info('close channel sub');
-        return this._chSub.close();
-      });
-      ok = ok.then((err) => {
-        if (err) throw err;
-        console.log('channel sub closed');
-        logger.info('channel sub closed');
-        console.log('close connection pub');
-        logger.info('close connection pub');
-        return this._connPub.close();
-      });
-      ok = ok.then((err) => {
-        if (err) throw err;
-        console.log('connection pub closed');
-        logger.info('connection pub closed');
-        console.log('close connection sub');
-        logger.info('close connection sub');
-        return this._connSub.close();
-      });
-      ok.then((err) => {
-        if (err) throw err;
-        console.log('connection sub closed');
-        logger.info('connection sub closed');
-        process.exit(0);
-      });
-
-
+  close(next) {
+    console.log('Got SIGINT.  Press Control-D to exit.');
+    logger.info('Got SIGINT.  Press Control-D to exit.');
+    console.log('close channel pub');
+    logger.info('close channel pub');
+    let ok = this._chPub.close();
+    ok = ok.then((err) => {
+      if (err) throw err;
+      console.log('channel pub closed');
+      logger.info('channel pub closed');
+      console.log('close channel sub');
+      logger.info('close channel sub');
+      return this._chSub.close();
+    });
+    ok = ok.then((err) => {
+      if (err) throw err;
+      console.log('channel sub closed');
+      logger.info('channel sub closed');
+      console.log('close connection pub');
+      logger.info('close connection pub');
+      return this._connPub.close();
+    });
+    ok = ok.then((err) => {
+      if (err) throw err;
+      console.log('connection pub closed');
+      logger.info('connection pub closed');
+      console.log('close connection sub');
+      logger.info('close connection sub');
+      return this._connSub.close();
+    });
+    ok.then((err) => {
+      if (err) throw err;
+      console.log('connection sub closed');
+      logger.info('connection sub closed');
+      next();
     });
   }
 

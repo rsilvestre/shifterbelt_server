@@ -32,6 +32,8 @@ var _underscore = require("underscore");
 
 var _underscore2 = _interopRequireDefault(_underscore);
 
+exports.messageClose = _modulesMessageJs.close;
+
 var ArrayStuff = (function (_Array) {
   function ArrayStuff() {
     _classCallCheck(this, ArrayStuff);
@@ -99,15 +101,17 @@ var authenticateInit = function authenticateInit() {
           nsp.connected[socket.id] = socket;
         });
 
-        if (!socketList.pushIfNotExist(socket.id, function (value) {
-          return value === socket.id;
+        if (!socketList.pushIfNotExist({ id: socket.id, socket: socket }, function (value) {
+          return value.id === socket.id;
         })) {
           return socket.close();
         }
 
         var linkDevice = new _modulesMessageJs.LinkDevice(device, socket, function (err, device, slaves) {
           if (err) {
-            return console.warn(err);
+            console.warn(err);
+            _libLoggerJs.logger.warn(err);
+            return;
           }
           socket.emit("authenticated");
           socket.emit("service", {

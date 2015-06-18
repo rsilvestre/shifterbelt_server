@@ -30,6 +30,16 @@ export let logger = {
             log.debug = value;
         }
     },
+    notice: (value) => {
+        if (log instanceof Logger) {
+            log.notice = value;
+        }
+    },
+    warn: (value) => {
+        if (log instanceof Logger) {
+            log.warning = value;
+        }
+    },
     info: (value) => {
         if (log instanceof Logger) {
             log.info = value;
@@ -58,6 +68,14 @@ export default class Logger {
 
     set debug(value) {
         this._log.debug(value);
+    }
+
+    set warning(value) {
+        this._log.warning(value);
+    }
+
+    set notice(value) {
+        this._log.notice(value);
     }
 
     set info(value) {

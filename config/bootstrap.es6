@@ -4,7 +4,9 @@
 
 import config from "./config.js"
 import adapters from "../adapters/index.js"
+import { logger } from "../lib/logger.js"
 import fs from 'fs'
+import async from 'async'
 
 function getAdapter(name) {
   return adapters[name];
@@ -20,9 +22,14 @@ function dbloader(key) {
 export default class Bootstrap {
   constructor(callback) {
     // Bootstrap models
-    fs.readdirSync(`${config.root}/models`).forEach(function(file) {
+    async.each(fs.readdirSync(`${config.root}/models`), function(file, callback) {
       if (/\.js$/.test(file)) {
         require(`${config.root}/models/${file}`);
+      }
+      callback()
+    },(err) => {
+      if (err) {
+        logger.warn(err);
       }
     });
   }
@@ -31,15 +38,19 @@ export default class Bootstrap {
     let App = require(`${config.root}/app.js`);
     var p = dbloader("database")
       .then(()=> {
+        logger.info('database loaded');
         return dbloader("memory");
       })
       .then(() => {
+        logger.info('memory loaded');
         return dbloader("queue");
       })
       .then(() => {
+        logger.info('queue loaded');
         return dbloader("websocket");
       })
       .then(() => {
+        logger.info('websocket loaded');
 
         let app = new App();
 

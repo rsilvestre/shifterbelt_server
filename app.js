@@ -36,6 +36,19 @@ var App = (function () {
 
       var controller = new _controllerIndexJsJs2["default"]();
       _libLoggerJs.logger.info("Shifterbelt started");
+
+      process.on("SIGINT", function () {
+        _libLoggerJs.logger.info("Shifterbelt is in the closing process");
+        controller.close(function () {
+          setTimeout(function () {
+            _adaptersAbsAdapterJs.adapters.getAdapter("queue").close(function () {
+              _adaptersAbsAdapterJs.adapters.getAdapter("websocket").close(function () {
+                process.exit(0);
+              });
+            });
+          }, 5000);
+        });
+      });
     }
   }, {
     key: "init_bak",
