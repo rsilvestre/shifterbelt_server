@@ -12,7 +12,6 @@ export default class RedisAdapter extends AbsAdapter {
     constructor(callback) {
         super("memory");
         this.init();
-        console.log('redis successfull connected');
         logger.info('redis successfull connected');
         callback(this);
     }
@@ -30,7 +29,6 @@ export default class RedisAdapter extends AbsAdapter {
         this._redisClient.on('error', function(err) {
             "use strict";
 
-            console.log('Error '+ err);
             logger.info('Error '+ err);
             log.info('Error '+ err);
         });

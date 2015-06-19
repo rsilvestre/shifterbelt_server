@@ -57,7 +57,6 @@ var MongooseAdapter = (function (_AbsAdapter) {
       this._mongoose.connect(mongooseConfig.url);
       this._db = this._mongoose.connection;
       this._db.once("open", function () {
-        console.log("mongoose successfull connected");
         _libLoggerJs.logger.info("mongoose successfull connected");
         callback(_this);
       });

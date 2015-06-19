@@ -47,18 +47,15 @@ var devicesContainer = {
  * @param next
  */
 var close1 = function close1(next) {
-  console.log("close message");
+  _libLoggerJs.logger.info("close message");
 
   Object.keys(devicesContainer).forEach(function (deviceListKey) {
-    console.log("disconnect device container: " + deviceListKey);
     _libLoggerJs.logger.info("disconnect device container: " + deviceListKey);
 
     Object.keys(devicesContainer[deviceListKey]).forEach(function (essaimKey) {
-      console.log("disconnect device essaim: " + essaimKey);
       _libLoggerJs.logger.info("disconnect device essaim: " + essaimKey);
 
       Object.keys(devicesContainer[deviceListKey][essaimKey]).forEach(function (deviceKey) {
-        console.log("disconnect device: " + deviceKey);
         _libLoggerJs.logger.info("disconnect device: " + deviceKey);
 
         var device = devicesContainer[deviceListKey][essaimKey][deviceKey];
@@ -78,18 +75,15 @@ exports.close1 = close1;
  * @param next
  */
 var close = function close(next) {
-  console.log("close message");
+  _libLoggerJs.logger.info("close message");
 
   _async2["default"].forEachOfSeries(devicesContainer, function (essaimList, deviceListKey, cbDeviceList) {
-    console.log("disconnect device container: " + deviceListKey);
     _libLoggerJs.logger.info("disconnect device container: " + deviceListKey);
 
     _async2["default"].forEachOf(essaimList, function (essaim, essaimKey, cbEssaim) {
-      console.log("disconnect device essaim: " + essaimKey);
       _libLoggerJs.logger.info("disconnect device essaim: " + essaimKey);
 
       _async2["default"].forEachOf(essaim, function (device, deviceKey, cbDevice) {
-        console.log("disconnect device: " + deviceKey);
         _libLoggerJs.logger.info("disconnect device: " + deviceKey);
 
         device.socket.emit("disconnect");
@@ -233,7 +227,6 @@ var LinkDevice = (function () {
         devicesContainer.masters["" + _this._data["application"]["businessId"]]["" + _this._data["device"]["macAddress"]] = _this;
 
         _this.createSubQueue("pubsub", _this._data["application"]["businessId"], _this.createFakeList(_this._data), function () {
-          console.log("" + _this._data["device"]["macAddress"] + " has been added to the SubPub queue of the essaim " + _this._data["application"]["businessId"]);
           _libLoggerJs.logger.info("" + _this._data["device"]["macAddress"] + " has been added to the SubPub queue of the essaim " + _this._data["application"]["businessId"]);
           _this._queue.registerSelectorQueue("topic", function (callback) {
             _this._send = callback;
@@ -271,7 +264,6 @@ var LinkDevice = (function () {
         devicesContainer.managers["" + _this2._data["application"]["businessId"]]["" + _this2._data["device"]["macAddress"]] = _this2;
 
         _this2.createSubQueue("pubsub", _this2._data["application"]["businessId"], _this2.createFakeList(_this2._data), function () {
-          console.log("" + _this2._data["device"]["macAddress"] + " has been added to the SubPub queue of the essaim " + _this2._data["application"]["businessId"]);
           _libLoggerJs.logger.info("" + _this2._data["device"]["macAddress"] + " has been added to the SubPub queue of the essaim " + _this2._data["application"]["businessId"]);
           _this2._queue.registerSelectorQueue("topic", function (callback) {
             _this2._send = callback;
@@ -309,7 +301,6 @@ var LinkDevice = (function () {
         devicesContainer.slaves["" + _this3._data["application"]["businessId"]]["" + _this3._data["device"]["macAddress"]] = _this3;
 
         _this3.createTopicQueue("topic", _this3._data["application"]["businessId"], _this3._data["device"]["macAddress"], _this3.createFakeList(_this3._data), function () {
-          console.log("" + _this3._data["device"]["macAddress"] + " has been added to the Topic queue of the essaim " + _this3._data["application"]["businessId"]);
           _libLoggerJs.logger.info("" + _this3._data["device"]["macAddress"] + " has been added to the Topic queue of the essaim " + _this3._data["application"]["businessId"]);
           _this3._queue.registerPubQueue("pubsub", function (callback) {
             _this3._send = callback;
@@ -355,7 +346,6 @@ var LinkDevice = (function () {
           if (!message) {
             return;
           }
-          console.log("subQueue message: " + message.content.toString());
           _libLoggerJs.logger.info("subQueue message: " + message.content.toString());
 
           var _JSON$parse3 = JSON.parse(message.content.toString());
@@ -400,7 +390,6 @@ var LinkDevice = (function () {
           if (!message) {
             return;
           }
-          console.log("topicQueue message: " + message.content.toString());
           _libLoggerJs.logger.info("topicQueue message: " + message.content.toString());
           list[essaim][key].socket.emit("message", message);
         }, function () {
@@ -429,7 +418,6 @@ var LinkDevice = (function () {
      */
     value: function disconnect(done) {
       var action = "disconnectFrom" + this._data["device"]["role"].charAt(0).toUpperCase() + "" + this._data["device"]["role"].slice(1);
-      console.log("action: " + action);
       _libLoggerJs.logger.info("action: " + action);
 
       //if (!this.hasOwnProperty(action)) {
@@ -461,7 +449,6 @@ var LinkDevice = (function () {
         return done(new Error("Nothing to do"));
       }
       delete devicesContainer["" + this._data.device.role + "s"][this._data["application"]["businessId"]][this._data["device"]["macAddress"]];
-      console.log("device: " + [this._data["device"]["macAddress"]] + ", has been removed from: " + this._data["application"]["businessId"]);
       _libLoggerJs.logger.info("device: " + [this._data["device"]["macAddress"]] + ", has been removed from: " + this._data["application"]["businessId"]);
       return done();
     }
@@ -476,7 +463,6 @@ var LinkDevice = (function () {
       var _this6 = this;
 
       this._queue.close("pubsub", "", function () {
-        console.log("queue for master: " + _this6._data["device"]["macAddress"] + ", has been unbinded");
         _libLoggerJs.logger.info("queue for master: " + _this6._data["device"]["macAddress"] + ", has been unbinded");
         _this6.deleteDevice(done);
       });
@@ -492,7 +478,6 @@ var LinkDevice = (function () {
       var _this7 = this;
 
       this._queue.close("pubsub", this._data["device"]["macAddress"], function () {
-        console.log("queue for manager: " + _this7._data["device"]["macAddress"] + ", has been unbinded");
         _libLoggerJs.logger.info("queue for manager: " + _this7._data["device"]["macAddress"] + ", has been unbinded");
         _this7.deleteDevice(done);
       });
@@ -508,10 +493,8 @@ var LinkDevice = (function () {
       var _this8 = this;
 
       var beforeClose = function beforeClose() {
-        console.log("queue for slave " + _this8._data["device"]["macAddress"] + ", is going to be removed from masters and managers");
         _libLoggerJs.logger.info("queue for slave " + _this8._data["device"]["macAddress"] + ", is going to be removed from masters and managers");
         _this8._queue.close("topic", _this8._data["device"]["macAddress"], function () {
-          console.log("queue for slave: " + _this8._data["device"]["macAddress"] + ", has been unbinded");
           _libLoggerJs.logger.info("queue for slave: " + _this8._data["device"]["macAddress"] + ", has been unbinded");
           _this8.deleteDevice(done);
         });
@@ -520,7 +503,6 @@ var LinkDevice = (function () {
       //let timeout = 20;
       //let interval = setInterval(() => {
 
-      //console.log('click');
       //logger.info('click');
 
       if (this._send) {

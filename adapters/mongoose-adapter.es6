@@ -22,7 +22,6 @@ export default class MongooseAdapter extends AbsAdapter {
     this._mongoose.connect(mongooseConfig.url);
     this._db = this._mongoose.connection;
     this._db.once('open', () => {
-      console.log('mongoose successfull connected');
       logger.info('mongoose successfull connected');
       callback(this);
     });

@@ -36,3 +36,4 @@ node_modules
 # Webstorm
 .idea
 
+env.json

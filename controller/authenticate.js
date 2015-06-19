@@ -76,7 +76,6 @@ var authenticateInit = function authenticateInit() {
 
   websocketAdapter.connection(function (socket) {
     var device = null;
-    console.log("a device is connected");
     _libLoggerJs.logger.info("a device is connected");
     socket.auth = false;
     //socket.emit('event', "first message");
@@ -91,12 +90,10 @@ var authenticateInit = function authenticateInit() {
           return;
         }
         device = success;
-        console.log("Authenticated socket: " + socket.id);
         _libLoggerJs.logger.info("Authenticated socket: " + socket.id);
         socket.auth = true;
 
         _underscore2["default"].each(websocketAdapter.io.nsps, function (nsp) {
-          console.log("restoring socket to: " + nsp.name);
           _libLoggerJs.logger.info("restoring socket to: " + nsp.name);
           nsp.connected[socket.id] = socket;
         });
@@ -133,10 +130,8 @@ var authenticateInit = function authenticateInit() {
         socket.on("disconnect", function () {
           linkDevice.disconnect(function (err) {
             if (err) {
-              console.log(err.message);
               return _libLoggerJs.logger.info(err.message);
             }
-            console.log("device disconnected, can be unlocked");
             _libLoggerJs.logger.info("device disconnected, can be unlocked");
           });
         });
@@ -144,20 +139,17 @@ var authenticateInit = function authenticateInit() {
     });
 
     socket.on("test", function (message) {
-      console.log(message);
       _libLoggerJs.logger.info(message);
     });
 
     setTimeout(function () {
       if (!socket.auth) {
-        console.log("Disconnection socket: " + socket.id);
         _libLoggerJs.logger.info("Disconnection socket: " + socket.id);
         socket.disconnect("unauthorized");
       }
     }, 5000);
 
     socket.on("disconnect", function () {
-      console.log("a device: " + socket.id + ", is disconnected");
       _libLoggerJs.logger.info("a device: " + socket.id + ", is disconnected");
     });
   });

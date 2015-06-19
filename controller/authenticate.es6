@@ -41,7 +41,6 @@ export let authenticateInit = () => {
 
   websocketAdapter.connection(function(socket) {
     let device = null;
-    console.log("a device is connected");
     logger.info("a device is connected");
     socket.auth = false;
     //socket.emit('event', "first message");
@@ -56,12 +55,10 @@ export let authenticateInit = () => {
           return;
         }
         device = success;
-        console.log(`Authenticated socket: ${socket.id}`);
         logger.info(`Authenticated socket: ${socket.id}`);
         socket.auth = true;
 
         _.each(websocketAdapter.io.nsps, (nsp) => {
-          console.log(`restoring socket to: ${nsp.name}`);
           logger.info(`restoring socket to: ${nsp.name}`);
           nsp.connected[socket.id] = socket;
         });
@@ -100,10 +97,8 @@ export let authenticateInit = () => {
         socket.on('disconnect', () => {
           linkDevice.disconnect((err) => {
             if (err) {
-              console.log(err.message);
               return logger.info(err.message);
             }
-            console.log('device disconnected, can be unlocked');
             logger.info('device disconnected, can be unlocked');
           });
         })
@@ -111,20 +106,17 @@ export let authenticateInit = () => {
     });
 
     socket.on('test', (message) => {
-      console.log(message);
       logger.info(message);
     });
 
     setTimeout(() => {
       if (!socket.auth) {
-        console.log(`Disconnection socket: ${socket.id}`);
         logger.info(`Disconnection socket: ${socket.id}`);
         socket.disconnect('unauthorized');
       }
     }, 5000);
 
     socket.on('disconnect', () => {
-      console.log(`a device: ${socket.id}, is disconnected`);
       logger.info(`a device: ${socket.id}, is disconnected`);
     })
 

@@ -44,7 +44,6 @@ var RedisAdapter = (function (_AbsAdapter) {
 
         _get(Object.getPrototypeOf(RedisAdapter.prototype), "constructor", this).call(this, "memory");
         this.init();
-        console.log("redis successfull connected");
         _libLoggerJs.logger.info("redis successfull connected");
         callback(this);
     }
@@ -66,7 +65,6 @@ var RedisAdapter = (function (_AbsAdapter) {
             this._redisClient.on("error", function (err) {
                 "use strict";
 
-                console.log("Error " + err);
                 _libLoggerJs.logger.info("Error " + err);
                 log.info("Error " + err);
             });

@@ -54,7 +54,6 @@ var MssqlAdapter = (function (_AbsAdapter) {
             this._connection = _mssql2["default"].connect(mssqlConfig, function (err) {
                 if (err) throw err;
                 _this._mssql = _mssql2["default"];
-                console.log("mssql successfull connected");
                 _libLoggerJs.logger.info("mssql successfull connected");
                 callback(_this);
             });

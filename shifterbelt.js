@@ -24,19 +24,19 @@ var logger = new _libLoggerJs2["default"]();
 logger.init(logConfig.config.logLevel, logConfig.config.path);
 
 try {
-    var bootstrap = new _configBootstrapJs2["default"]();
-    bootstrap.run();
+  var bootstrap = new _configBootstrapJs2["default"]();
+  bootstrap.run();
 } catch (e) {
-    console.error(e);
+  logger.info = e;
 }
 //import Identify from './lib/identify.js'
 
 /*let identify = new Identify();
-identify.user((err, result) => {
-    if (err) throw err;
-    console.log(result);
-    logger.info(result);
-});*/
+ identify.user((err, result) => {
+ if (err) throw err;
+ console.log(result);
+ logger.info(result);
+ });*/
 //let app = App();
 
 //# sourceMappingURL=shifterbelt.js.map

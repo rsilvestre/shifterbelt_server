@@ -1,0 +1,1 @@
+{"version":3,"sources":["test.es6"],"names":[],"mappings":";;AAAA,IAAI,OAAO,mBAAmB,CAAC;;;;;;AAM/B,MAAM,CAAC,OAAO,GAAG;AACf,IAAE,mCAAmC,EACtC,CAAC","file":"test.js","sourcesContent":["let baseUrl = `localhost:3000`;\n\n/**\n * Expose\n */\n\nmodule.exports = {\n  db: `mongodb://localhost/noobjs_test`,\n};\n"]}

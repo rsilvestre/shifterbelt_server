@@ -23,7 +23,6 @@ export default class RabbitAdapter extends AbsAdapter {
     this._context.on('ready', () => {
       "use strict";
 
-      console.log('rabbit successfull connected');
       logger.info('rabbit successfull connected');
       this._pub = this._context.socket('PUB');
       this._sub = this._context.socket('SUB');
@@ -32,7 +31,6 @@ export default class RabbitAdapter extends AbsAdapter {
       this._sub.on('data', (note) => {
         "use strict";
 
-        console.log(`Alarum! '${note}'`);
         logger.info(`Alarum! '${note}'`);
       });
 

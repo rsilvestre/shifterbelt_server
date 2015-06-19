@@ -39,7 +39,6 @@ export default class App {
       result[0].forEach((value) => {
         applications[value["ApplicationId"]] = modelManager.instanciate("Application", value['ApplicationName']);
       });
-      console.log(applications);
       logger.info(applications);
       mssqlAdapter.connection.close();
     };
@@ -51,7 +50,6 @@ export default class App {
       if (err) return callback(err, null);
       return callback(null, records);
     });
-    //console.log(mssqlAdapter.mssql);
     //logger.info(mssqlAdapter.mssql);
   }
 }

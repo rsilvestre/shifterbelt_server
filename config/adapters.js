@@ -67,7 +67,7 @@ var config = {
     socketIo: {
         adapter: 'wsAdapter',
         config: {
-            port: process.env.PORT || 3000,
+            port: process.env.CORE_PORT || 3000,
             namespace: 'ns'
         }
     }

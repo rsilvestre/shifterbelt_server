@@ -47,14 +47,12 @@ export default class WebsocketAdapter extends AbsAdapter {
     _.each(this._io.nsps, (nsp) => {
       nsp.on('connection', (socket) => {
         if (socket.auth) {
-          console.log(`removing socket from: ${nsp.name}`);
           logger.info(`removing socket from: ${nsp.name}`);
           delete nsp.connected[socket.id];
         }
       });
     });
     this._nsp = this._io.of(websocketConfig.namespace);
-    console.log('socket.io successfull connected');
     logger.info('socket.io successfull connected');
     callback(this);
   }
@@ -80,10 +78,8 @@ export default class WebsocketAdapter extends AbsAdapter {
   }
 
   close(next) {
-    console.log('close websocket');
     logger.info('close websocket');
     this._io.close();
-    console.log('close server');
     logger.info('close server');
     this._server.close();
     next();

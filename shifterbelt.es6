@@ -10,17 +10,17 @@ let logger = new Logger();
 logger.init(logConfig.config.logLevel, logConfig.config.path);
 
 try {
-    let bootstrap = new Bootstrap();
-    bootstrap.run();
-} catch(e) {
-    console.error(e);
+  let bootstrap = new Bootstrap();
+  bootstrap.run();
+} catch (e) {
+  logger.info = e;
 }
 //import Identify from './lib/identify.js'
 
 /*let identify = new Identify();
-identify.user((err, result) => {
-    if (err) throw err;
-    console.log(result);
-    logger.info(result);
-});*/
+ identify.user((err, result) => {
+ if (err) throw err;
+ console.log(result);
+ logger.info(result);
+ });*/
 //let app = App();

@@ -94,7 +94,6 @@ var Authentication = (function () {
         if (null === result.device.role || result.device.role.length === 0 || result.device.role === "") {
           return callback(new Error("The key and password are not correct"), null);
         }
-        console.log(result);
         _libLoggerJs.logger.info(result);
         return callback(null, result);
       });

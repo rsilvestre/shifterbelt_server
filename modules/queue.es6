@@ -62,7 +62,6 @@ export default class Queue {
     });
 
     ok = ok.then(() => {
-      console.log(' [*] Waiting for message');
       logger.info(' [*] Waiting for message');
       if (next) {
         next();
@@ -88,7 +87,6 @@ export default class Queue {
       return this._queueAdapter.chSub.consume(`${this._essaim}|${queue}`, subMessage, { noAck: false });
     });
     ok = ok.then(() => {
-      console.log(" [*] Waiting for messages. To exit press CTRL+C");
       logger.info(" [*] Waiting for messages. To exit press CTRL+C");
       if (next) {
         next();
@@ -128,7 +126,6 @@ export default class Queue {
     });
 
     ok = ok.then(() => {
-      console.log(' [*] Waiting for logs. To exit press CTRL+C.');
       logger.info(' [*] Waiting for logs. To exit press CTRL+C.');
       if (next) {
         next();
@@ -145,14 +142,12 @@ export default class Queue {
    * @returns {{exchange}|{exchange, ticket, type, passive, durable, autoDelete, internal, nowait, arguments}}
    */
   registerPubQueue(queue, next) {
-    console.log(`queue: ${this._essaim}`);
     logger.info(`queue: ${this._essaim}`);
     let ok = this._queueAdapter.chPub.assertExchange(`${this._essaim}|${queue}`, 'fanout', { durable: false });
 
     ok = ok.then(() => {
       next((message, callback) => {
         this._queueAdapter.chPub.publish(`${this._essaim}|${queue}`, '', new Buffer(message));
-        console.log(` [x] Sent '${message}'`);
         logger.info(` [x] Sent '${message}'`);
         if (callback) {
           callback();
@@ -170,14 +165,12 @@ export default class Queue {
    * @returns {{exchange}|{exchange, ticket, type, passive, durable, autoDelete, internal, nowait, arguments}}
    */
   registerTaskQueue(queue, next) {
-    console.log(`queue: ${this._essaim}`);
     logger.info(`queue: ${this._essaim}`);
     var ok = this._queueAdapter.assertQueue(`${this._essaim}|${queue}`, { durable: true });
 
     ok = ok.then(() => {
       next((message, callback) => {
         this._queueAdapter.chPub.sendToQueue(`${this._essaim}|${queue}`, new Buffer(message), { deliveryMode: true });
-        console.log(` [x] Sent '${message}'`);
         logger.info(` [x] Sent '${message}'`);
         if (callback) {
           callback();
@@ -199,7 +192,6 @@ export default class Queue {
     ok = ok.then(() => {
       next((message, key, callback) => {
         this._queueAdapter.chPub.publish(`${this._essaim}|${queue}`, key, new Buffer(message));
-        console.log(` [x] Sent ${key}: '${message}'`);
         logger.info(` [x] Sent ${key}: '${message}'`);
         if (callback) {
           callback();

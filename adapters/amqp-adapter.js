@@ -75,38 +75,29 @@ var AmqpAdapter = (function (_AbsAdapter) {
     value: function close(next) {
       var _this3 = this;
 
-      console.log("Got SIGINT.  Press Control-D to exit.");
       _libLoggerJs.logger.info("Got SIGINT.  Press Control-D to exit.");
-      console.log("close channel pub");
       _libLoggerJs.logger.info("close channel pub");
       var ok = this._chPub.close();
       ok = ok.then(function (err) {
         if (err) throw err;
-        console.log("channel pub closed");
         _libLoggerJs.logger.info("channel pub closed");
-        console.log("close channel sub");
         _libLoggerJs.logger.info("close channel sub");
         return _this3._chSub.close();
       });
       ok = ok.then(function (err) {
         if (err) throw err;
-        console.log("channel sub closed");
         _libLoggerJs.logger.info("channel sub closed");
-        console.log("close connection pub");
         _libLoggerJs.logger.info("close connection pub");
         return _this3._connPub.close();
       });
       ok = ok.then(function (err) {
         if (err) throw err;
-        console.log("connection pub closed");
         _libLoggerJs.logger.info("connection pub closed");
-        console.log("close connection sub");
         _libLoggerJs.logger.info("close connection sub");
         return _this3._connSub.close();
       });
       ok.then(function (err) {
         if (err) throw err;
-        console.log("connection sub closed");
         _libLoggerJs.logger.info("connection sub closed");
         next();
       });
@@ -119,7 +110,6 @@ var AmqpAdapter = (function (_AbsAdapter) {
       var amqpConfig = config.adapters.getConfig("queue");
       _amqplib2["default"].connect(amqpConfig.url).then(function (conn) {
         _this4._connSub = conn;
-        console.log("amqb sub connected successfull connected");
         _libLoggerJs.logger.info("amqb sub connected successfull connected");
         return conn.createChannel().then(function (ch) {
           _this4._chSub = ch;
@@ -135,7 +125,6 @@ var AmqpAdapter = (function (_AbsAdapter) {
       var amqpConfig = config.adapters.getConfig("queue");
       _amqplib2["default"].connect(amqpConfig.url).then(function (conn) {
         _this5._connPub = conn;
-        console.log("amqb pub connected successfull connected");
         _libLoggerJs.logger.info("amqb pub connected successfull connected");
         return (0, _when2["default"])(conn.createChannel().then(function (ch) {
           _this5._chPub = ch;

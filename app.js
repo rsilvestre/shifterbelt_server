@@ -61,7 +61,6 @@ var App = (function () {
         result[0].forEach(function (value) {
           applications[value["ApplicationId"]] = _libModelManagerJs.modelManager.instanciate("Application", value["ApplicationName"]);
         });
-        console.log(applications);
         _libLoggerJs.logger.info(applications);
         mssqlAdapter.connection.close();
       };
@@ -73,7 +72,6 @@ var App = (function () {
         if (err) return callback(err, null);
         return callback(null, records);
       });
-      //console.log(mssqlAdapter.mssql);
       //logger.info(mssqlAdapter.mssql);
     }
   }]);

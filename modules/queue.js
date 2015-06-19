@@ -91,7 +91,6 @@ var Queue = (function () {
       });
 
       ok = ok.then(function () {
-        console.log(" [*] Waiting for message");
         _libLoggerJs.logger.info(" [*] Waiting for message");
         if (next) {
           next();
@@ -121,7 +120,6 @@ var Queue = (function () {
         return _this3._queueAdapter.chSub.consume("" + _this3._essaim + "|" + queue, subMessage, { noAck: false });
       });
       ok = ok.then(function () {
-        console.log(" [*] Waiting for messages. To exit press CTRL+C");
         _libLoggerJs.logger.info(" [*] Waiting for messages. To exit press CTRL+C");
         if (next) {
           next();
@@ -165,7 +163,6 @@ var Queue = (function () {
       });
 
       ok = ok.then(function () {
-        console.log(" [*] Waiting for logs. To exit press CTRL+C.");
         _libLoggerJs.logger.info(" [*] Waiting for logs. To exit press CTRL+C.");
         if (next) {
           next();
@@ -186,14 +183,12 @@ var Queue = (function () {
     value: function registerPubQueue(queue, next) {
       var _this5 = this;
 
-      console.log("queue: " + this._essaim);
       _libLoggerJs.logger.info("queue: " + this._essaim);
       var ok = this._queueAdapter.chPub.assertExchange("" + this._essaim + "|" + queue, "fanout", { durable: false });
 
       ok = ok.then(function () {
         next(function (message, callback) {
           _this5._queueAdapter.chPub.publish("" + _this5._essaim + "|" + queue, "", new Buffer(message));
-          console.log(" [x] Sent '" + message + "'");
           _libLoggerJs.logger.info(" [x] Sent '" + message + "'");
           if (callback) {
             callback();
@@ -215,14 +210,12 @@ var Queue = (function () {
     value: function registerTaskQueue(queue, next) {
       var _this6 = this;
 
-      console.log("queue: " + this._essaim);
       _libLoggerJs.logger.info("queue: " + this._essaim);
       var ok = this._queueAdapter.assertQueue("" + this._essaim + "|" + queue, { durable: true });
 
       ok = ok.then(function () {
         next(function (message, callback) {
           _this6._queueAdapter.chPub.sendToQueue("" + _this6._essaim + "|" + queue, new Buffer(message), { deliveryMode: true });
-          console.log(" [x] Sent '" + message + "'");
           _libLoggerJs.logger.info(" [x] Sent '" + message + "'");
           if (callback) {
             callback();
@@ -248,7 +241,6 @@ var Queue = (function () {
       ok = ok.then(function () {
         next(function (message, key, callback) {
           _this7._queueAdapter.chPub.publish("" + _this7._essaim + "|" + queue, key, new Buffer(message));
-          console.log(" [x] Sent " + key + ": '" + message + "'");
           _libLoggerJs.logger.info(" [x] Sent " + key + ": '" + message + "'");
           if (callback) {
             callback();

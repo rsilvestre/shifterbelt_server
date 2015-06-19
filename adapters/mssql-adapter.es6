@@ -19,7 +19,6 @@ export default class MssqlAdapter extends AbsAdapter {
         this._connection = mssql.connect(mssqlConfig, (err) => {
             if (err) throw err;
             this._mssql = mssql;
-            console.log('mssql successfull connected');
             logger.info('mssql successfull connected');
             callback(this);
         });

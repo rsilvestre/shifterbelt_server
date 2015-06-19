@@ -17,68 +17,74 @@ import Log from "log"
 import fs from "fs"
 import appRootPath from "app-root-path"
 import logentries from 'node-logentries';
+import config from '../config/config'
 export var log = null;
 
 export let logger = {
-    error: (value) => {
-        if (log instanceof Logger) {
-            log.error = value;
-        }
-    },
-    debug: (value) => {
-        if (log instanceof Logger) {
-            log.debug = value;
-        }
-    },
-    notice: (value) => {
-        if (log instanceof Logger) {
-            log.notice = value;
-        }
-    },
-    warn: (value) => {
-        if (log instanceof Logger) {
-            log.warning = value;
-        }
-    },
-    info: (value) => {
-        if (log instanceof Logger) {
-            log.info = value;
-        }
+  error: (value) => {
+    if (log instanceof Logger) {
+      log.error = value;
     }
+  },
+  debug: (value) => {
+    if (log instanceof Logger) {
+      log.debug = value;
+    }
+  },
+  notice: (value) => {
+    if (log instanceof Logger) {
+      log.notice = value;
+    }
+  },
+  warn: (value) => {
+    if (log instanceof Logger) {
+      log.warning = value;
+    }
+  },
+  info: (value) => {
+    if (log instanceof Logger) {
+      log.info = value;
+    }
+  }
 };
 
 export default class Logger {
-    constructor() {
-    }
+  constructor() {
+  }
 
-    init(logLevel, logFile) {
-        if (["error", "debug", "info"].indexOf(logLevel) == -1) {
-            return new Error(`The log level: ${logLevel}, not exist`);
-        }
-        //log = new Log(logLevel, fs.createWriteStream(`${appRootPath}/log/${logFile}`));
-        this._log = logentries.logger({
-            token:'9d7712a2-b05b-45a6-8505-f84424153b79'
-        });
-        log = this;
+  init(logLevel, logFile) {
+    if (["error", "debug", "info"].indexOf(logLevel) == -1) {
+      return new Error(`The log level: ${logLevel}, not exist`);
     }
+    //log = new Log(logLevel, fs.createWriteStream(`${appRootPath}/log/${logFile}`));
+    this._log = logentries.logger({
+      token: config.logentries_token
+    });
+    log = this;
+  }
 
-    set error(value) {
-        this._log.error(value);
-    }
+  set error(value) {
+    console.error(value);
+    this._log.error(value);
+  }
 
-    set debug(value) {
-        this._log.debug(value);
-    }
+  set debug(value) {
+    console.log(value);
+    this._log.debug(value);
+  }
 
-    set warning(value) {
-        this._log.warning(value);
-    }
+  set warning(value) {
+    console.warn(value);
+    this._log.warning(value);
+  }
 
-    set notice(value) {
-        this._log.notice(value);
-    }
+  set notice(value) {
+    console.log(value);
+    this._log.notice(value);
+  }
 
-    set info(value) {
-        this._log.info(value);
-    }
+  set info(value) {
+    console.info(value);
+    this._log.info(value);
+  }
 }

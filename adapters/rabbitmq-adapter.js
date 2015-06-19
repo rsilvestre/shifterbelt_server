@@ -58,7 +58,6 @@ var RabbitAdapter = (function (_AbsAdapter) {
       this._context.on("ready", function () {
         "use strict";
 
-        console.log("rabbit successfull connected");
         _libLoggerJs.logger.info("rabbit successfull connected");
         _this._pub = _this._context.socket("PUB");
         _this._sub = _this._context.socket("SUB");
@@ -67,7 +66,6 @@ var RabbitAdapter = (function (_AbsAdapter) {
         _this._sub.on("data", function (note) {
           "use strict";
 
-          console.log("Alarum! '" + note + "'");
           _libLoggerJs.logger.info("Alarum! '" + note + "'");
         });
 

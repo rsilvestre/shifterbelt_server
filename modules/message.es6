@@ -25,18 +25,15 @@ let devicesContainer = {
  * @param next
  */
 export let close1 = (next) => {
-  console.log('close message');
+  logger.info('close message');
 
   Object.keys(devicesContainer).forEach((deviceListKey) => {
-    console.log(`disconnect device container: ${deviceListKey}`);
     logger.info(`disconnect device container: ${deviceListKey}`);
 
     Object.keys(devicesContainer[deviceListKey]).forEach((essaimKey) => {
-      console.log(`disconnect device essaim: ${essaimKey}`);
       logger.info(`disconnect device essaim: ${essaimKey}`);
 
       Object.keys(devicesContainer[deviceListKey][essaimKey]).forEach((deviceKey) => {
-        console.log(`disconnect device: ${deviceKey}`);
         logger.info(`disconnect device: ${deviceKey}`);
 
         let device = devicesContainer[deviceListKey][essaimKey][deviceKey];
@@ -55,18 +52,15 @@ export let close1 = (next) => {
  * @param next
  */
 export let close = (next) => {
-  console.log('close message');
+  logger.info('close message');
 
   async.forEachOfSeries(devicesContainer, (essaimList, deviceListKey, cbDeviceList) => {
-    console.log(`disconnect device container: ${deviceListKey}`);
     logger.info(`disconnect device container: ${deviceListKey}`);
 
     async.forEachOf(essaimList, (essaim, essaimKey, cbEssaim) => {
-      console.log(`disconnect device essaim: ${essaimKey}`);
       logger.info(`disconnect device essaim: ${essaimKey}`);
 
       async.forEachOf(essaim, (device, deviceKey, cbDevice) => {
-        console.log(`disconnect device: ${deviceKey}`);
         logger.info(`disconnect device: ${deviceKey}`);
 
         device.socket.emit('disconnect');
@@ -186,7 +180,6 @@ export class LinkDevice {
       devicesContainer.masters[`${this._data['application']['businessId']}`][`${this._data['device']['macAddress']}`] = this;
 
       this.createSubQueue(`pubsub`, this._data['application']['businessId'], this.createFakeList(this._data), () => {
-        console.log(`${this._data['device']['macAddress']} has been added to the SubPub queue of the essaim ${this._data['application']['businessId']}`);
         logger.info(`${this._data['device']['macAddress']} has been added to the SubPub queue of the essaim ${this._data['application']['businessId']}`);
         this._queue.registerSelectorQueue(`topic`, (callback) => {
           this._send = callback;
@@ -218,7 +211,6 @@ export class LinkDevice {
       devicesContainer.managers[`${this._data['application']['businessId']}`][`${this._data['device']['macAddress']}`] = this;
 
       this.createSubQueue(`pubsub`, this._data['application']['businessId'], this.createFakeList(this._data), () => {
-        console.log(`${this._data['device']['macAddress']} has been added to the SubPub queue of the essaim ${this._data['application']['businessId']}`);
         logger.info(`${this._data['device']['macAddress']} has been added to the SubPub queue of the essaim ${this._data['application']['businessId']}`);
         this._queue.registerSelectorQueue(`topic`, (callback) => {
           this._send = callback;
@@ -248,7 +240,6 @@ export class LinkDevice {
       devicesContainer.slaves[`${this._data['application']['businessId']}`][`${this._data['device']['macAddress']}`] = this;
 
       this.createTopicQueue(`topic`, this._data['application']['businessId'], this._data['device']['macAddress'], this.createFakeList(this._data), () => {
-        console.log(`${this._data['device']['macAddress']} has been added to the Topic queue of the essaim ${this._data['application']['businessId']}`);
         logger.info(`${this._data['device']['macAddress']} has been added to the Topic queue of the essaim ${this._data['application']['businessId']}`);
         this._queue.registerPubQueue(`pubsub`, (callback) => {
           this._send = callback;
@@ -291,7 +282,6 @@ export class LinkDevice {
         if (!message) {
           return;
         }
-        console.log('subQueue message: ' + message.content.toString());
         logger.info('subQueue message: ' + message.content.toString());
         let {type: type, message: msg} = JSON.parse(message.content.toString());
         if (!type) {
@@ -327,7 +317,6 @@ export class LinkDevice {
         if (!message) {
           return;
         }
-        console.log('topicQueue message: ' + message.content.toString());
         logger.info('topicQueue message: ' + message.content.toString());
         list[essaim][key].socket.emit('message', message);
       }, () => {
@@ -352,7 +341,6 @@ export class LinkDevice {
    */
   disconnect(done) {
     let action = `disconnectFrom${this._data['device']['role'].charAt(0).toUpperCase()}${this._data['device']['role'].slice(1)}`;
-    console.log(`action: ${action}`);
     logger.info(`action: ${action}`);
 
     //if (!this.hasOwnProperty(action)) {
@@ -382,7 +370,6 @@ export class LinkDevice {
       return done(new Error('Nothing to do'));
     }
     delete(devicesContainer[`${this._data.device.role}s`][this._data['application']['businessId']][this._data['device']['macAddress']]);
-    console.log(`device: ${[this._data['device']['macAddress']]}, has been removed from: ${this._data['application']['businessId']}`);
     logger.info(`device: ${[this._data['device']['macAddress']]}, has been removed from: ${this._data['application']['businessId']}`);
     return done();
   }
@@ -393,7 +380,6 @@ export class LinkDevice {
    */
   disconnectFromMaster(done) {
     this._queue.close(`pubsub`, '', () => {
-      console.log(`queue for master: ${this._data['device']['macAddress']}, has been unbinded`);
       logger.info(`queue for master: ${this._data['device']['macAddress']}, has been unbinded`);
       this.deleteDevice(done);
     });
@@ -405,7 +391,6 @@ export class LinkDevice {
    */
   disconnectFromManager(done) {
     this._queue.close(`pubsub`, this._data['device']['macAddress'], () => {
-      console.log(`queue for manager: ${this._data['device']['macAddress']}, has been unbinded`);
       logger.info(`queue for manager: ${this._data['device']['macAddress']}, has been unbinded`);
       this.deleteDevice(done);
     });
@@ -417,10 +402,8 @@ export class LinkDevice {
    */
   disconnectFromSlave(done) {
     let beforeClose = () => {
-      console.log(`queue for slave ${this._data['device']['macAddress']}, is going to be removed from masters and managers`);
       logger.info(`queue for slave ${this._data['device']['macAddress']}, is going to be removed from masters and managers`);
       this._queue.close(`topic`, this._data['device']['macAddress'], () => {
-        console.log(`queue for slave: ${this._data['device']['macAddress']}, has been unbinded`);
         logger.info(`queue for slave: ${this._data['device']['macAddress']}, has been unbinded`);
         this.deleteDevice(done);
       });
@@ -429,7 +412,6 @@ export class LinkDevice {
     //let timeout = 20;
     //let interval = setInterval(() => {
 
-    //console.log('click');
     //logger.info('click');
 
     if (this._send) {
