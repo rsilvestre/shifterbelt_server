@@ -22,34 +22,35 @@ export var log = null;
 
 export let logger = {
   error: (value) => {
-    if (log instanceof Logger) {
+    if (log instanceof LoggerAbs) {
       log.error = value;
     }
   },
   debug: (value) => {
-    if (log instanceof Logger) {
+    if (log instanceof LoggerAbs) {
       log.debug = value;
     }
   },
   notice: (value) => {
-    if (log instanceof Logger) {
+    if (log instanceof LoggerAbs) {
       log.notice = value;
     }
   },
   warn: (value) => {
-    if (log instanceof Logger) {
+    if (log instanceof LoggerAbs) {
       log.warning = value;
     }
   },
   info: (value) => {
-    if (log instanceof Logger) {
+    if (log instanceof LoggerAbs) {
       log.info = value;
     }
   }
 };
 
-export default class Logger {
+class LoggerAbs {
   constructor() {
+
   }
 
   init(logLevel, logFile) {
@@ -61,6 +62,13 @@ export default class Logger {
       token: config.logentries_token
     });
     log = this;
+  }
+
+}
+
+class LoggerDev extends LoggerAbs {
+  constructor() {
+    super();
   }
 
   set error(value) {
@@ -86,5 +94,50 @@ export default class Logger {
   set info(value) {
     console.info(value);
     this._log.info(value);
+  }
+}
+
+class LoggerProd extends LoggerAbs {
+  constructor() {
+    super();
+  }
+
+  set error(value) {
+    this._log.error(value);
+  }
+
+  set debug(value) {
+    this._log.debug(value);
+  }
+
+  set warning(value) {
+    this._log.warning(value);
+  }
+
+  set notice(value) {
+    this._log.notice(value);
+  }
+
+  set info(value) {
+    this._log.info(value);
+  }
+}
+
+export default class Logger {
+  constructor() {
+    return {
+      development: () => {
+        return new LoggerDev();
+      },
+      pre_prod: () => {
+        return new LoggerDev();
+      },
+      test: ()=> {
+        return new LoggerDev();
+      },
+      production: ()=> {
+        return new LoggerProd();
+      }
+    }[process.env.NODE_ENV || 'development']();
   }
 }

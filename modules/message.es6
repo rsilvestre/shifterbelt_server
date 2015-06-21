@@ -24,33 +24,6 @@ let devicesContainer = {
  *
  * @param next
  */
-export let close1 = (next) => {
-  logger.info('close message');
-
-  Object.keys(devicesContainer).forEach((deviceListKey) => {
-    logger.info(`disconnect device container: ${deviceListKey}`);
-
-    Object.keys(devicesContainer[deviceListKey]).forEach((essaimKey) => {
-      logger.info(`disconnect device essaim: ${essaimKey}`);
-
-      Object.keys(devicesContainer[deviceListKey][essaimKey]).forEach((deviceKey) => {
-        logger.info(`disconnect device: ${deviceKey}`);
-
-        let device = devicesContainer[deviceListKey][essaimKey][deviceKey];
-        device.socket.emit('disconnect');
-        device.socket.disconnect();
-      });
-    });
-  });
-
-  next();
-};
-
-/**
- * Process to disconnect the talker when the server stop
- *
- * @param next
- */
 export let close = (next) => {
   logger.info('close message');
 

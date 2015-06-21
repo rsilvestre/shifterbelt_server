@@ -46,34 +46,6 @@ var devicesContainer = {
  *
  * @param next
  */
-var close1 = function close1(next) {
-  _libLoggerJs.logger.info("close message");
-
-  Object.keys(devicesContainer).forEach(function (deviceListKey) {
-    _libLoggerJs.logger.info("disconnect device container: " + deviceListKey);
-
-    Object.keys(devicesContainer[deviceListKey]).forEach(function (essaimKey) {
-      _libLoggerJs.logger.info("disconnect device essaim: " + essaimKey);
-
-      Object.keys(devicesContainer[deviceListKey][essaimKey]).forEach(function (deviceKey) {
-        _libLoggerJs.logger.info("disconnect device: " + deviceKey);
-
-        var device = devicesContainer[deviceListKey][essaimKey][deviceKey];
-        device.socket.emit("disconnect");
-        device.socket.disconnect();
-      });
-    });
-  });
-
-  next();
-};
-
-exports.close1 = close1;
-/**
- * Process to disconnect the talker when the server stop
- *
- * @param next
- */
 var close = function close(next) {
   _libLoggerJs.logger.info("close message");
 
@@ -400,16 +372,6 @@ var LinkDevice = (function () {
       });
     }
   }, {
-    key: "socket",
-
-    /**
-     * Return socket
-     * @returns {socket.io}
-     */
-    get: function () {
-      return this._socket;
-    }
-  }, {
     key: "disconnect",
 
     /**
@@ -528,6 +490,16 @@ var LinkDevice = (function () {
       //function stopFunction() {
       //  clearInterval(interval);
       //}
+    }
+  }, {
+    key: "socket",
+
+    /**
+     * Return socket
+     * @returns {socket.io}
+     */
+    get: function () {
+      return this._socket;
     }
   }]);
 
