@@ -56,7 +56,7 @@ let config = {
         adapter: "amqpAdapter",
         config: {
             //url: 'amqp://cutma1X1:aSSRFXC7_K5MvnwAGKrg3uZ7CMTCiTNt@swift-bluebell-30.bigwig.lshift.net:11068/0kFUqWJSIiki'
-            url: process.env.CLOUDAMQP_URL || 'amqp://localhost'
+            url: process.env.CLOUDAMQP_URL || 'amqp://192.168.99.100:32769'
         }
     },
     socketIo: {

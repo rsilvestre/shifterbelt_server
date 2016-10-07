@@ -27,7 +27,8 @@
     "mocha": "^2.2.4"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "start": "PORT=31000 pm2 start shifterbelt.js"
   },
   "repository": {
     "type": "git",
